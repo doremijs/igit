@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=https://igit.erguotou.me/schema/0.0.1/schema.json
+hooks:
+  enabled: true
+  hooks:
+    post-checkout: git checkout --theirs -- .
+    pre-commit: git diff --cached --name-only | xargs -I {} git add {}
+staged_hooks:
+  enabled: true
+  rules:
+    '*.{js,jsx,ts,tsx}': biome check --write
+    '*.{css,scss,less,styl,stylus}': stylelint --fix
+commit_msg:
+  enabled: true
+  prependEmoji: true

@@ -1,0 +1,6 @@
+{
+  "name": "@doremijs/igit",
+  "workspaces": [
+    "packages/*"
+  ]
+}

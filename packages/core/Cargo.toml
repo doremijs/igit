@@ -1,0 +1,24 @@
+[package]
+edition = "2021"
+name = "doremojs_igit"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+dirs-next = "2.0.0"
+fast-glob = "0.4.1"
+# Default enable napi4 feature, see https://nodejs.org/api/n-api.html#node-api-version-matrix
+napi = { version = "2.12.2", default-features = false, features = ["napi4"] }
+napi-derive = "2.12.2"
+pathbuf = "1.0.0"
+serde = { version = "1.0.216", features = ["derive"] }
+serde_yaml = "0.9.34"
+
+[build-dependencies]
+napi-build = "2.0.1"
+
+[profile.release]
+lto = true
+strip = "symbols"
