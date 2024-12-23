@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { readFile } from 'node:fs/promises'
 import { init, install, runHook } from "@doremijs/igit-core";
 
@@ -27,7 +29,11 @@ async function start() {
 			install();
 			break;
 		case "run":
-			runHook(options[0], options.slice(1));
+      try {
+        runHook(options[0], options.slice(1));
+      } catch (error) {
+        process.exit(1)
+      }
 			break;
 		case "version": {
 			const pkg = await readFile("../package.json", "utf-8");
