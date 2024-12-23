@@ -11,10 +11,10 @@
   "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "build": "bun build src/index.ts --outdir bin --target node --external @doremijs/igit-core"
+    "build": "bun build src/index.ts --outdir bin --target node --entry-naming [dir]/[name].mjs --external @doremijs/igit-core"
   },
   "bin": {
-    "igit": "./bin/index.js"
+    "igit": "./bin/index.mjs"
   },
   "dependencies": {
     "@doremijs/igit-core": "workspace:*"

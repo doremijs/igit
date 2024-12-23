@@ -118,25 +118,21 @@ run_command {} run "{}" "$@"
   Ok(())
 }
 
-#[derive(Debug)]
+// #[derive(Debug)]
+#[allow(dead_code)]
 struct CommitMessage {
   commit_type: String,
-  #[warn(dead_code)]
   scope: Option<String>,
-  #[warn(dead_code)]
   is_breaking: bool,
-  #[warn(dead_code)]
   description: String,
-  #[warn(dead_code)]
   body: Option<String>,
-  #[warn(dead_code)]
   footers: Option<Vec<CommitMessageFooter>>,
 }
 
-#[derive(Debug)]
+// #[derive(Debug)]
+#[allow(dead_code)]
 struct CommitMessageFooter {
   key: String,
-  #[warn(dead_code)]
   value: String,
 }
 
