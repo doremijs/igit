@@ -1,0 +1,22 @@
+{
+  "name": "@doremijs/igit-cli",
+  "module": "src/index.ts",
+  "type": "module",
+  "files": ["bin"],
+  "bin": {
+    "igit": "./bin/index.mjs"
+  },
+  "scripts": {
+    "build": "bun build src/index.ts --outdir bin --target node --entry-naming [dir]/[name].mjs --external @doremijs/igit-core"
+  },
+  "dependencies": {
+    "@doremijs/igit-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/node": "^22.10.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

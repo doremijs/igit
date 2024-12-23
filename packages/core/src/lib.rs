@@ -7,6 +7,7 @@ use napi::{Error, Result};
 mod config;
 mod git;
 mod hooks;
+mod command;
 
 #[napi]
 pub fn init() -> Result<()> {

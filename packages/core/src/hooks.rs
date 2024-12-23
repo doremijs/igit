@@ -7,6 +7,7 @@ use std::fs;
 use std::path::Path;
 use std::process::Command;
 use fast_glob::glob_match;
+use crate::command::run_command;
 
 pub fn install() -> Result<(), Box<dyn Error>> {
   let git_exists = is_git_installed();
@@ -61,24 +62,54 @@ pub fn install() -> Result<(), Box<dyn Error>> {
     }
 
     // generate hooks
-    for (hook_name, script) in config.hooks.hooks.iter() {
+    for hook_name in hooks.iter() {
       let hook_path = hooks_dir.join(hook_name);
+      let bin_entry_path = Path::new("./node_modules/@doremijs/igit-cli/bin/index.mjs");
+      // if !bin_entry_path.exists() {
+      //   let global_dirs = vec!["bun", "deno", "pnpm", "yarn", "node"];
+      //   let global_paths = vec![
+      //       ".config/yarn/global/node_modules/@doremijs/igit-cli/bin/index.mjs",
+      //       ".local/share/pnpm/global/node_modules/@doremijs/igit-cli/bin/index.mjs",
+      //       ".config/bun/global/node_modules/@doremijs/igit-cli/bin/index.mjs",
+      //       ".deno/bin/index.mjs",
+      //       ".npm-global/lib/node_modules/@doremijs/igit-cli/bin/index.mjs",
+      //   ];
+      //   for dir in global_dirs {
+      //       for path in &global_paths {
+      //           let global_path = Path::new(&format!("{}/.{}", dir, path));
+      //           if global_path.exists() {
+      //               bin_entry_path = global_path;
+      //               break;
+      //           }
+      //       }
+      //       if bin_entry_path != Path::new("./node_modules/@doremijs/igit-cli/bin/index.mjs") {
+      //           break;
+      //       }
+      //   }
+      // }
       let hook_content = format!(
         r#"#!/bin/sh
-run_command(entry, command, args) {{
+run_command() {{
     if command -v bun > /dev/null 2>&1; then
-        bun $entry $command $args
+        bun "$@"
     elif command -v deno > /dev/null 2>&1; then
-        deno run $entry $command $args
+        deno run "$@"
     else
-        node $entry $command $args
+        node "$@"
     fi
 }}
 
-run_command ../cli/bin/index.mjs run "{}" "$@"
+run_command {} run "{}" "$@"
 "#,
-        script
+        bin_entry_path.to_string_lossy(),
+        hook_name
       );
+//       let hook_content = format!(
+// r#"#!/bin/sh
+// npx @doremijs/igit-cli run "{}" "$@"
+// "#,
+//         hook_name
+//       );
       fs::write(&hook_path, hook_content)?;
       Command::new("chmod").arg("+x").arg(&hook_path).output()?;
     }
@@ -219,9 +250,7 @@ fn append_emoji_for_message(message: &CommitMessage, original_message: &str) -> 
   if let Some(scope) = &message.scope {
     commit_type_with_scope = format!("{}({})", commit_type_with_scope, scope);
   }
-  let ret = original_message.replace(&format!("{}:", commit_type_with_scope), &format!("{}: {}", commit_type_with_scope, emoji));
-  println!("{}", ret);
-  ret
+  original_message.replace(&format!("{}:", commit_type_with_scope), &format!("{}: {}", commit_type_with_scope, emoji))
 }
 
 /**
@@ -246,10 +275,8 @@ fn run_commands_for_staged_files(config: &IgitConfig) -> Result<(), Box<dyn Erro
       }
     }
     if !matched_files.is_empty() {
-      Command::new("sh")
-        .arg("-c")
-        .arg(format!("{} {}", command, matched_files.join(" ")))
-        .output()?;
+      println!("Running staged command: {} for files: {}", command, pattern);
+      run_command(command, &matched_files.join(" "))?;
     }
   }
   Ok(())
@@ -290,6 +317,7 @@ pub fn run_hook(hook_name: &str, args: &Vec<String>) -> Result<(), Box<dyn Error
         // prepend emoji
         if config.commit_msg.prepend_emoji {
           commit_message_str = append_emoji_for_message(&commit_message, &mut commit_message_str);
+          println!("Append emoji for message");
           fs::write(commit_message_path, commit_message_str)?;
         }
       }
@@ -297,20 +325,8 @@ pub fn run_hook(hook_name: &str, args: &Vec<String>) -> Result<(), Box<dyn Error
     }
     // hooks
     if config.hooks.enabled {
-      let output: std::process::Output = Command::new("sh")
-        .arg("-c")
-        .arg(format!("{} {}", script, args.join(" ")))
-        .output()?;
-      if !output.status.success() {
-        return Err(
-          format!(
-            "Hook {} failed with exit code {}",
-            hook_name,
-            output.status.code().unwrap_or(-1)
-          )
-          .into(),
-        );
-      }
+      println!("Run {} hook: {}", hook_name, script);
+      run_command(script, &args.join(" "))?;
     }
   }
   Ok(())

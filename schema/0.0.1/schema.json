@@ -98,6 +98,12 @@
         "enabled": {
           "type": "boolean"
         },
+        "validTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "prependEmoji": {
           "type": "boolean"
         }

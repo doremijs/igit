@@ -20,7 +20,7 @@ pub struct StagedHooksConfig {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CommitLintConfig {
   pub enabled: bool,
-  #[serde(rename = "valid_types")]
+  #[serde(rename = "validTypes")]
   pub valid_types: Option<Vec<String>>,
   #[serde(rename = "prependEmoji")]
   pub prepend_emoji: bool,
