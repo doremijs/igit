@@ -9,7 +9,7 @@ pub fn run_command(command: &str, args: &str) -> Result<(), Box<dyn Error>> {
     .stderr(std::process::Stdio::inherit())
     .output()?;
   if !output.status.success() {
-    return Err(format!("Command failed: {}", String::from_utf8_lossy(&output.stderr)).into());
+    return Err("Command failed".into());
   }
   Ok(())
 }
