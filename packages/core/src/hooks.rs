@@ -1,5 +1,5 @@
 use crate::{
-  config::{parse, IgitConfig},
+  config::{parse, HookCommand, IgitConfig},
   git::{is_git_installed, is_git_repo},
 };
 use std::error::Error;
@@ -118,7 +118,7 @@ run_command {} run "{}" "$@"
   Ok(())
 }
 
-// #[derive(Debug)]
+#[derive(Debug)]
 #[allow(dead_code)]
 struct CommitMessage {
   commit_type: String,
@@ -129,7 +129,7 @@ struct CommitMessage {
   footers: Option<Vec<CommitMessageFooter>>,
 }
 
-// #[derive(Debug)]
+#[derive(Debug)]
 #[allow(dead_code)]
 struct CommitMessageFooter {
   key: String,
@@ -250,6 +250,26 @@ fn append_emoji_for_message(message: &CommitMessage, original_message: &str) -> 
 }
 
 /**
+ * glob match
+ */
+fn get_matched_files<'a>(pattern: &'a str, files: &Vec<&'a str>) -> Vec<&'a str> {
+  let mut matched_files = Vec::new();
+  for file in files.iter() {
+    if glob_match(&pattern, file) {
+      matched_files.push(*file);
+    }
+  }
+  matched_files
+}
+
+fn get_commands(command: &HookCommand) -> Vec<&str> {
+  match command {
+    HookCommand::Single(_command) => vec![_command.as_str()],
+    HookCommand::Multiple(_commands) => _commands.iter().map(|s| s.as_str()).collect::<Vec<&str>>(),
+  }
+}
+
+/**
  * run commands for staged files
  */
 fn run_commands_for_staged_files(config: &IgitConfig) -> Result<(), Box<dyn Error>> {
@@ -264,15 +284,13 @@ fn run_commands_for_staged_files(config: &IgitConfig) -> Result<(), Box<dyn Erro
   let files = String::from_utf8(staged_files.stdout)?;
   let staged_files = files.trim().split('\n').collect::<Vec<&str>>();
   for (pattern, command) in config.staged_hooks.rules.iter() {
-    let mut matched_files = Vec::new();
-    for file in staged_files.iter() {
-      if glob_match(&pattern, file) {
-        matched_files.push(*file);
-      }
-    }
+    let matched_files = get_matched_files(&pattern, &staged_files);
     if !matched_files.is_empty() {
-      println!("Running staged command: {} for files: {}", command, pattern);
-      run_command(command, &matched_files.join(" "))?;
+      let commands = get_commands(command);
+      for command in commands {
+        println!("Running staged command: {} for files: {}", command, pattern);
+        run_command(command, &matched_files.join(" "))?;
+      }
     }
   }
   Ok(())
@@ -283,46 +301,49 @@ fn run_commands_for_staged_files(config: &IgitConfig) -> Result<(), Box<dyn Erro
  */
 pub fn run_hook(hook_name: &str, args: &Vec<String>) -> Result<(), Box<dyn Error>> {
   let config = parse()?;
-  if let Some(script) = config.hooks.hooks.get(hook_name) {
-    // pre-commit hook
-    if hook_name == "pre-commit" {
-      if config.staged_hooks.enabled {
-        if config.staged_hooks.rules.keys().len() > 0 {
-          run_commands_for_staged_files(&config)?;
-        }
+  // pre-commit hook
+  if hook_name == "pre-commit" {
+    if config.staged_hooks.enabled {
+      if config.staged_hooks.rules.keys().len() > 0 {
+        run_commands_for_staged_files(&config)?;
       }
     }
-    // commit message hook
-    else if hook_name == "commit-msg" {
-      if config.commit_msg.enabled {
-        let commit_message_path = &args[0];
-        let mut commit_message_str = fs::read_to_string(commit_message_path)
-            .map_err(|e| format!("Failed to read commit message from {}: {}", commit_message_path, e))?;
-        commit_message_str = commit_message_str.trim().to_string();
-        let commit_message = parse_commit_message(&commit_message_str)?;
-        // is valid commit type
-        let valid_types = if config.commit_msg.valid_types.is_some() {
-          config.commit_msg.valid_types.unwrap()
-        } else {
-          // default valid types
-          DEFAULT_VALID_TYPES.iter().map(|&s| s.to_string()).collect::<Vec<String>>()
-        };
-        if !valid_types.contains(&commit_message.commit_type) {
-          return Err(format!("Invalid commit type: {}", commit_message.commit_type).into());
-        }
-        // prepend emoji
-        if config.commit_msg.prepend_emoji {
-          commit_message_str = append_emoji_for_message(&commit_message, &mut commit_message_str);
-          println!("Append emoji for message");
-          fs::write(commit_message_path, commit_message_str)?;
-        }
+  }
+  // commit message hook
+  else if hook_name == "commit-msg" {
+    if config.commit_msg.enabled {
+      let commit_message_path = &args[0];
+      let mut commit_message_str = fs::read_to_string(commit_message_path)
+          .map_err(|e| format!("Failed to read commit message from {}: {}", commit_message_path, e))?;
+      commit_message_str = commit_message_str.trim().to_string();
+      let commit_message = parse_commit_message(&commit_message_str)?;
+      // is valid commit type
+      let valid_types = if config.commit_msg.valid_types.is_some() {
+        config.commit_msg.valid_types.unwrap()
+      } else {
+        // default valid types
+        DEFAULT_VALID_TYPES.iter().map(|&s| s.to_string()).collect::<Vec<String>>()
+      };
+      if !valid_types.contains(&commit_message.commit_type) {
+        return Err(format!("Invalid commit type: {}", commit_message.commit_type).into());
       }
+      // prepend emoji
+      if config.commit_msg.prepend_emoji {
+        commit_message_str = append_emoji_for_message(&commit_message, &mut commit_message_str);
+        println!("Append emoji for message");
+        fs::write(commit_message_path, commit_message_str)?;
+      }
+    }
 
-    }
+  }
+  if let Some(script) = config.hooks.hooks.get(hook_name) {
     // hooks
     if config.hooks.enabled {
-      println!("Run {} hook: {}", hook_name, script);
-      run_command(script, &args.join(" "))?;
+      let commands = get_commands(script);
+      for command in commands {
+        println!("Run {} hook: {}", hook_name, command);
+        run_command(command, &args.join(" "))?;
+      }
     }
   }
   Ok(())
@@ -461,5 +482,31 @@ mod tests {
     let message = parse_commit_message(message_str).unwrap();
     let result = append_emoji_for_message(&message, &message_str);
     assert_eq!(result, "unknown: 💡 update documentation");
+  }
+
+  #[test]
+  fn test_get_matched_files() {
+    let files = vec!["foo/bar/baz.css", "src/main.rs", "src/lib.rs", "tests/test.rs", "README.md"];
+
+    let matched = get_matched_files("**/*.rs", &files);
+    assert_eq!(matched.len(), 3);
+    assert!(matched.contains(&"src/main.rs"));
+    assert!(matched.contains(&"src/lib.rs"));
+    assert!(matched.contains(&"tests/test.rs"));
+
+    let matched = get_matched_files("**/*.{rs,md}", &files);
+    assert_eq!(matched.len(), 4);
+    assert!(matched.contains(&"src/main.rs"));
+    assert!(matched.contains(&"src/lib.rs"));
+    assert!(matched.contains(&"tests/test.rs"));
+    assert!(matched.contains(&"README.md"));
+
+    let matched = get_matched_files("*/*.css", &files);
+    assert_eq!(matched.len(), 0);
+
+    let matched = get_matched_files("!**/*.rs", &files);
+    assert_eq!(matched.len(), 2);
+    assert!(matched.contains(&"foo/bar/baz.css"));
+    assert!(matched.contains(&"README.md"));
   }
 }

@@ -5,31 +5,55 @@ use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(untagged)]
+pub enum HookCommand {
+    Single(String),
+    Multiple(Vec<String>),
+}
+
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct HooksConfig {
+  #[serde(default)]
   pub enabled: bool,
-  pub hooks: HashMap<String, String>,
+  #[serde(default)]
+  pub hooks: HashMap<String, HookCommand>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+// impl Default for HooksConfig {
+//   fn default() -> Self {
+//     Self {
+//       enabled: false,
+//       hooks: HashMap::new(),
+//     }
+//   }
+// }
+
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct StagedHooksConfig {
+  #[serde(default)]
   pub enabled: bool,
-  pub rules: std::collections::HashMap<String, String>,
+  #[serde(default)]
+  pub rules: HashMap<String, HookCommand>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct CommitLintConfig {
+  #[serde(default)]
   pub enabled: bool,
-  #[serde(rename = "validTypes")]
+  #[serde(default, rename = "validTypes", skip_serializing_if = "Option::is_none")]
   pub valid_types: Option<Vec<String>>,
-  #[serde(rename = "prependEmoji")]
+  #[serde(default, rename = "prependEmoji")]
   pub prepend_emoji: bool,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct IgitConfig {
+  #[serde(default)]
   pub hooks: HooksConfig,
+  #[serde(default)]
   pub staged_hooks: StagedHooksConfig,
+  #[serde(default)]
   pub commit_msg: CommitLintConfig,
 }
 
@@ -43,41 +67,19 @@ pub fn init() -> std::io::Result<()> {
     fs::create_dir_all(config_dir)?;
   }
 
-  let config = IgitConfig {
-    hooks: HooksConfig {
-      enabled: true,
-      hooks: HashMap::new(),
-    },
-    staged_hooks: StagedHooksConfig {
-      enabled: true,
-      rules: [
-        (
-          "*.{js,jsx,ts,tsx}".to_string(),
-          "biome check --write".to_string(),
-        ),
-        (
-          "*.{css,scss,less,styl,stylus}".to_string(),
-          "stylelint --fix".to_string(),
-        ),
-      ]
-      .iter()
-      .cloned()
-      .collect(),
-    },
-    commit_msg: CommitLintConfig {
-      enabled: true,
-      valid_types: None,
-      prepend_emoji: true,
-    },
-  };
-
-  let mut yaml = serde_yaml::to_string(&config).unwrap();
-  yaml = format!(
-    "# yaml-language-server: $schema=https://igit.erguotou.me/schema/0.0.1/schema.json\n{}",
-    yaml
-  );
-
-  fs::write(config_file, yaml)
+  fs::write(config_file, "# yaml-language-server: $schema=https://igit.erguotou.me/schema/0.0.1/schema.json
+hooks:
+  enabled: true
+  hooks: {}
+staged_hooks:
+  enabled: true
+  rules:
+    '**/*.{css,scss,less,styl,stylus}': stylelint --fix
+    '**/*.{js,jsx,ts,tsx}': biome check --write
+commit_msg:
+  enabled: true
+  prependEmoji: true
+")
 }
 
 pub fn parse() -> Result<IgitConfig, String> {

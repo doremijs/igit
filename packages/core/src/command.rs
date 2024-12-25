@@ -5,7 +5,7 @@ pub fn run_command(command: &str, args: &str) -> Result<(), Box<dyn Error>> {
   let output = Command::new("sh")
     .arg("-c")
     .arg(format!("PATH=$PATH:./node_modules/.bin {} {}", command, args))
-    // .stdout(std::process::Stdio::inherit())
+    .stdout(std::process::Stdio::inherit())
     .stderr(std::process::Stdio::inherit())
     .output()?;
   if !output.status.success() {

@@ -12,64 +12,64 @@
           "type": "object",
           "properties": {
             "applypatch-msg": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "pre-applypatch": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "pre-commit": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "pre-merge-commit": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "prepare-commit-msg": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "commit-msg": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "post-commit": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "pre-rebase": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "post-checkout": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "post-merge": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "pre-push": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "pre-receive": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "update": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "proc-receive": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "post-receive": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "post-update": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "reference-transaction": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "push-to-checkout": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "pre-auto-gc": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             },
             "post-rewrite": {
-              "type": "string"
+              "$ref": "#/definitions/stringOrStringArray"
             }
           },
           "additionalProperties": true
@@ -86,7 +86,7 @@
         "rules": {
           "type": "object",
           "additionalProperties": {
-            "type": "string"
+            "$ref": "#/definitions/stringOrStringArray"
           }
         }
       },
@@ -109,6 +109,21 @@
         }
       },
       "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "stringOrStringArray": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
     }
   },
   "additionalProperties": false
