@@ -33,7 +33,9 @@ jobs:
               export MACOSX_DEPLOYMENT_TARGET=10.13
               export SDKROOT=$(xcrun -sdk macosx --show-sdk-path)
               export MACOSX_ARCHITECTURES=x86_64
+              export CARGO_BUILD_TARGET=x86_64-apple-darwin
               yarn workspace @doremijs/igit-core build --target x86_64-apple-darwin
+              mv packages/core/igit-core.darwin-arm64.node packages/core/igit-core.darwin-x64.node
           - host: windows-latest
             build: yarn workspace @doremijs/igit-core build --target x86_64-pc-windows-msvc
             target: x86_64-pc-windows-msvc
@@ -163,7 +165,9 @@ jobs:
           cache: yarn
           architecture: ${{ matrix.settings.arch }}
       - name: Install dependencies
-        run: yarn install
+        run: |
+          yarn config set supportedArchitectures.cpu "${{ matrix.settings.arch }}"
+          yarn install
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
