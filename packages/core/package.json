@@ -15,7 +15,14 @@
       ]
     }
   },
-  "license": "MIT",
+  "description": "A CLI tool for combining git workflows with Rust bindings",
+  "keywords": [
+    "igit",
+    "cli",
+    "git",
+    "hooks"
+  ],
+  "license": "LGPL-3.0-or-later",
   "devDependencies": {
     "@napi-rs/cli": "^2.18.4",
     "ava": "^6.0.1"

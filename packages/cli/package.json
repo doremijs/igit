@@ -8,8 +8,8 @@
     "git",
     "hooks"
   ],
-  "license": "MIT",
-  "main": "index.js",
+  "license": "LGPL-3.0-or-later",
+  "main": "bin/index.mjs",
   "scripts": {
     "build": "bun build src/index.ts --outdir bin --target node --entry-naming [dir]/[name].mjs --external @doremijs/igit-core"
   },
