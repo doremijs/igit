@@ -34,5 +34,8 @@
     "test": "ava",
     "universal": "napi universal",
     "version": "napi version"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^12.1.0"
   }
 }

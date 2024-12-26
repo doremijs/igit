@@ -116,6 +116,16 @@ jobs:
         run: ${{ matrix.settings.build }}
         if: ${{ !matrix.settings.docker }}
         shell: bash
+      - name: Debug build output
+        run: |
+          echo "Current directory:"
+          pwd
+          ls -la
+          echo "Listing packages/igit-core directory:"
+          ls -la packages/igit-core/
+          echo "Listing target directory:"
+          ls -la packages/igit-core/target/release/
+        shell: bash
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
