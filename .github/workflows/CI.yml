@@ -367,6 +367,8 @@ jobs:
         shell: bash
       - name: Publish
         run: |
+          mv README.md packages/cli/README.md
+          mv README.md packages/core/README.md
           npm config set provenance true
           if git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$";
           then
