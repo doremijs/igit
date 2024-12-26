@@ -121,16 +121,16 @@ jobs:
           echo "Current directory:"
           pwd
           ls -la
-          echo "Listing packages/igit-core directory:"
-          ls -la packages/igit-core/
+          echo "Listing packages/core directory:"
+          ls -la packages/core/
           echo "Listing target directory:"
-          ls -la packages/igit-core/target/release/
+          ls -la packages/core/target/release/
         shell: bash
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: bindings-${{ matrix.settings.target }}
-          path: packages/igit-core/${{ env.APP_NAME }}.*.node
+          path: packages/core/${{ env.APP_NAME }}.*.node
           if-no-files-found: error
   test-macOS-windows-binding:
     name: Test bindings on ${{ matrix.settings.target }} - node@${{ matrix.node }}
@@ -162,7 +162,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: bindings-${{ matrix.settings.target }}
-          path: packages/igit-core
+          path: packages/core
       - name: List packages
         run: ls -R .
         shell: bash
@@ -192,7 +192,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: bindings-x86_64-unknown-linux-gnu
-          path: packages/igit-core
+          path: packages/core
       - name: List packages
         run: ls -R .
         shell: bash
@@ -224,7 +224,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: bindings-x86_64-unknown-linux-musl
-          path: packages/igit-core
+          path: packages/core
       - name: List packages
         run: ls -R .
         shell: bash
@@ -247,7 +247,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: bindings-aarch64-unknown-linux-gnu
-          path: packages/igit-core
+          path: packages/core
       - name: List packages
         run: ls -R .
         shell: bash
@@ -281,7 +281,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: bindings-aarch64-unknown-linux-musl
-          path: packages/igit-core
+          path: packages/core
       - name: List packages
         run: ls -R .
         shell: bash
@@ -328,11 +328,11 @@ jobs:
       - name: Move artifacts
         run: yarn workspace @doremijs/igit-core artifacts
       - name: List packages
-        run: ls -R ./packages/igit-core/npm
+        run: ls -R ./packages/core/npm
         shell: bash
       - name: Publish
         run: |
-          cd packages/igit-core
+          cd packages/core
           npm config set provenance true
           if git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$";
           then
