@@ -29,7 +29,11 @@ jobs:
         settings:
           - host: macos-latest
             target: x86_64-apple-darwin
-            build: yarn workspace @doremijs/igit-core build --target x86_64-apple-darwin
+            build: |
+              export MACOSX_DEPLOYMENT_TARGET=10.13
+              export SDKROOT=$(xcrun -sdk macosx --show-sdk-path)
+              export MACOSX_ARCHITECTURES=x86_64
+              yarn workspace @doremijs/igit-core build --target x86_64-apple-darwin
           - host: windows-latest
             build: yarn workspace @doremijs/igit-core build --target x86_64-pc-windows-msvc
             target: x86_64-pc-windows-msvc
@@ -142,8 +146,10 @@ jobs:
         settings:
           - host: macos-latest
             target: x86_64-apple-darwin
+            arch: x64
           - host: windows-latest
             target: x86_64-pc-windows-msvc
+            arch: x64
         node:
           - '18'
           - '20'
@@ -155,7 +161,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
           cache: yarn
-          architecture: x64
+          architecture: ${{ matrix.settings.arch }}
       - name: Install dependencies
         run: yarn install
       - name: Download artifacts
