@@ -34,8 +34,18 @@ jobs:
               export SDKROOT=$(xcrun -sdk macosx --show-sdk-path)
               export MACOSX_ARCHITECTURES=x86_64
               export CARGO_BUILD_TARGET=x86_64-apple-darwin
+              echo "Building with target: x86_64-apple-darwin"
+              echo "Node arch: $(node -p 'process.arch')"
+              echo "Node platform: $(node -p 'process.platform')"
               yarn workspace @doremijs/igit-core build --target x86_64-apple-darwin
-              mv packages/core/igit-core.darwin-arm64.node packages/core/igit-core.darwin-x64.node
+              echo "Build output:"
+              ls -la packages/core/
+              if [ -f "packages/core/igit-core.darwin-arm64.node" ]; then
+                echo "Renaming darwin-arm64 to darwin-x64"
+                mv packages/core/igit-core.darwin-arm64.node packages/core/igit-core.darwin-x64.node
+              fi
+              echo "Final output:"
+              ls -la packages/core/
           - host: windows-latest
             build: yarn workspace @doremijs/igit-core build --target x86_64-pc-windows-msvc
             target: x86_64-pc-windows-msvc
@@ -174,10 +184,25 @@ jobs:
           name: bindings-${{ matrix.settings.target }}
           path: packages/core
       - name: List packages
-        run: ls -R .
+        run: |
+          echo "Current directory:"
+          pwd
+          echo "Directory structure:"
+          ls -R .
+          echo "Core package contents:"
+          ls -la packages/core/
         shell: bash
       - name: Test bindings
-        run: yarn workspace @doremijs/igit-core test
+        env:
+          MACOSX_DEPLOYMENT_TARGET: '10.13'
+          SDKROOT: $(xcrun -sdk macosx --show-sdk-path)
+          MACOSX_ARCHITECTURES: x86_64
+          DEBUG: napi:*
+        run: |
+          echo "Node arch: $(node -p 'process.arch')"
+          echo "Node platform: $(node -p 'process.platform')"
+          yarn workspace @doremijs/igit-core test
+        shell: bash
   test-linux-x64-gnu-binding:
     name: Test bindings on Linux-x64-gnu - node@${{ matrix.node }}
     needs:
