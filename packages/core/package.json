@@ -34,6 +34,5 @@
     "test": "ava",
     "universal": "napi universal",
     "version": "napi version"
-  },
-  "packageManager": "bun@1.1.19"
+  }
 }

@@ -14,10 +14,12 @@ permissions:
       - '**'
     paths-ignore:
       - '**/*.md'
+      - .vscode/**
+      - igit.yaml
       - LICENSE
       - '**/*.gitignore'
       - .editorconfig
-      - docs/**
+      - packages/doc/**
   pull_request: null
 jobs:
   build:

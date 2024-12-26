@@ -288,7 +288,7 @@ fn run_commands_for_staged_files(config: &IgitConfig) -> Result<(), Box<dyn Erro
     if !matched_files.is_empty() {
       let commands = get_commands(command);
       for command in commands {
-        println!("Running staged command: {} for files: {}", command, pattern);
+        println!("\x1b[90mRunning staged command:\x1b[0m \x1b[32m{}\x1b[0m \x1b[90mfor\x1b[0m \x1b[32m{}\x1b[0m \x1b[90mfiles that match pattern(\x1b[0m\x1b[34m{}\x1b[0m\x1b[90m)\x1b[0m", command, matched_files.len(), pattern);
         run_command(command, &matched_files.join(" "))?;
       }
     }
@@ -330,7 +330,7 @@ pub fn run_hook(hook_name: &str, args: &Vec<String>) -> Result<(), Box<dyn Error
       // prepend emoji
       if config.commit_msg.prepend_emoji {
         commit_message_str = append_emoji_for_message(&commit_message, &mut commit_message_str);
-        println!("Append emoji for message");
+        println!("\x1b[32mAppend emoji for commit message.\x1b[0m");
         fs::write(commit_message_path, commit_message_str)?;
       }
     }
@@ -341,7 +341,7 @@ pub fn run_hook(hook_name: &str, args: &Vec<String>) -> Result<(), Box<dyn Error
     if config.hooks.enabled {
       let commands = get_commands(script);
       for command in commands {
-        println!("Run {} hook: {}", hook_name, command);
+        println!("\x1b[90mRunning\x1b[0m \x1b[34m{}\x1b[0m \x1b[90mhook:\x1b[0m \x1b[32m{}\x1b[0m", hook_name, command);
         run_command(command, &args.join(" "))?;
       }
     }
@@ -353,6 +353,14 @@ pub fn run_hook(hook_name: &str, args: &Vec<String>) -> Result<(), Box<dyn Error
 #[cfg(test)]
 mod tests {
   use super::*;
+
+  #[test]
+  fn test_color_print() {
+    println!("\x1b[32mAppend emoji for message\x1b[0m");
+    println!("\x1b[90mRunning staged command:\x1b[0m \x1b[32m{}\x1b[0m \x1b[90mfor\x1b[0m \x1b[32m{}\x1b[0m \x1b[90mfiles that match pattern(\x1b[0m\x1b[34m{}\x1b[0m\x1b[90m)\x1b[0m", "biome check --write", 4, "**/*.{ts,tsx}");
+    println!("\x1b[90mRunning\x1b[0m \x1b[34m{}\x1b[0m \x1b[90mhook:\x1b[0m \x1b[32m{}\x1b[0m", "pre-commit", "echo hello");
+    assert!(true);
+  }
 
   #[test]
   fn test_commit_message_with_description_and_breaking_change_footer() {
