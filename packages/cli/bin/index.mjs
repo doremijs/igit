@@ -28,6 +28,7 @@ async function start() {
       try {
         runHook(options[0], options.slice(1));
       } catch (error) {
+        console.error('\x1b[31mHooks failed to run\x1b[0m');
         process.exit(1);
       }
       break;

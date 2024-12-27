@@ -25,7 +25,7 @@
   "license": "LGPL-3.0-or-later",
   "repository": {
     "type": "git",
-    "url": "https://github.com/erguotou520/igit.git",
+    "url": "https://github.com/doremijs/igit.git",
     "directory": "packages/core"
   },
   "devDependencies": {

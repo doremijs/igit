@@ -1,7 +1,7 @@
 # iGit 🚀
 
 [![NPM Version](https://img.shields.io/npm/v/@doremijs/igit-cli.svg)](https://www.npmjs.com/package/@doremijs/igit-cli)
-[![License](https://img.shields.io/npm/l/@doremijs/igit-cli.svg)](https://github.com/erguotou/igit/blob/main/LICENSE)
+[![License](https://img.shields.io/npm/l/@doremijs/igit-cli.svg)](https://github.com/doremijs/igit/blob/main/LICENSE)
 
 一个强大的 Git Hooks 管理工具，让你的 Git 工作流更加智能和高效。✨
 
@@ -17,11 +17,11 @@
 ## 安装 📥
 
 ```bash
-npm install -g @doremijs/igit-cli
+npm install @doremijs/igit-cli
 # 或者使用 yarn
-yarn global add @doremijs/igit-cli
+yarn add @doremijs/igit-cli
 # 或者使用 pnpm
-pnpm add -g @doremijs/igit-cli
+pnpm add @doremijs/igit-cli
 ```
 
 ## 快速开始 🚀

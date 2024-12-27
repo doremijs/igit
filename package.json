@@ -5,7 +5,7 @@
   "private": true,
   "repository": {
     "type": "git",
-    "url": "https://github.com/erguotou520/igit.git"
+    "url": "https://github.com/doremijs/igit.git"
   },
   "workspaces": [
     "packages/*"
