@@ -376,10 +376,12 @@ jobs:
           if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+            npm --workspace=@doremijs/igit-core run prepublishOnly
             npm publish --workspace=@doremijs/igit-core --access public
             npm publish --workspace=@doremijs/igit-cli --access public
           elif [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+            npm --workspace=@doremijs/igit-core run prepublishOnly
             npm publish --workspace=@doremijs/igit-core --tag next --access public
             npm publish --workspace=@doremijs/igit-cli --tag next --access public
           else
