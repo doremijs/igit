@@ -23,6 +23,11 @@
     "hooks"
   ],
   "license": "LGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erguotou520/igit.git",
+    "directory": "packages/core"
+  },
   "devDependencies": {
     "@napi-rs/cli": "^2.18.4",
     "ava": "^6.0.1"

@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "license": "LGPL-3.0-or-later",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erguotou520/igit.git"
+  },
   "workspaces": [
     "packages/*"
   ],
