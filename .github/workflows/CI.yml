@@ -10,8 +10,10 @@ permissions:
   push:
     branches:
       - main
-    tags:
-      - 'v*'
+    # tags:
+    #   - 'v*'
+    tags-ignore:
+      - '**'
     paths-ignore:
       - packages/doc/**
       - .vscode/**
@@ -349,9 +351,9 @@ jobs:
       - test-linux-aarch64-musl-binding
     steps:
       - uses: actions/checkout@v4
-      - name: Get version from tag
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+      # - name: Get version from tag
+      #   id: get_version
+      #   run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
       - name: Setup node
         uses: actions/setup-node@v4
         with:
@@ -362,24 +364,45 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          path: packages/core/artifacts
       - name: Move artifacts
         run: yarn workspace @doremijs/igit-core artifacts
       - name: List packages
         run: ls -R ./packages/core/npm
         shell: bash
+      # - name: Publish
+      #   run: |
+      #     cp README.md packages/cli/README.md
+      #     cp README.md packages/core/README.md
+      #     npm config set provenance true
+      #     if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+      #       echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      #       echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      #       npm --workspace=@doremijs/igit-core run prepublishOnly
+      #       npm publish --workspace=@doremijs/igit-core --access public
+      #       npm publish --workspace=@doremijs/igit-cli --access public
+      #     elif [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+      #       echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+      #       npm --workspace=@doremijs/igit-core run prepublishOnly
+      #       npm publish --workspace=@doremijs/igit-core --tag next --access public
+      #       npm publish --workspace=@doremijs/igit-cli --tag next --access public
+      #     else
+      #       echo "Not a release, skipping publish"
+      #     fi
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish
         run: |
           cp README.md packages/cli/README.md
           cp README.md packages/core/README.md
           npm config set provenance true
-          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
+          if git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$"; then
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
             npm --workspace=@doremijs/igit-core run prepublishOnly
             npm publish --workspace=@doremijs/igit-core --access public
             npm publish --workspace=@doremijs/igit-cli --access public
-          elif [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          elif git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+"; then
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
             npm --workspace=@doremijs/igit-core run prepublishOnly
             npm publish --workspace=@doremijs/igit-core --tag next --access public
