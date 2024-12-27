@@ -10,8 +10,8 @@ permissions:
   push:
     branches:
       - main
-    tags-ignore:
-      - '**'
+    tags:
+      - 'v*'
     paths-ignore:
       - packages/doc/**
       - .vscode/**
@@ -349,6 +349,9 @@ jobs:
       - test-linux-aarch64-musl-binding
     steps:
       - uses: actions/checkout@v4
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
       - name: Setup node
         uses: actions/setup-node@v4
         with:
@@ -370,13 +373,12 @@ jobs:
           cp README.md packages/cli/README.md
           cp README.md packages/core/README.md
           npm config set provenance true
-          if git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$";
-          then
+          if [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
             npm publish --workspace=@doremijs/igit-core --access public
             npm publish --workspace=@doremijs/igit-cli --access public
-          elif git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+";
-          then
+          elif [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
             npm publish --workspace=@doremijs/igit-core --tag next --access public
             npm publish --workspace=@doremijs/igit-cli --tag next --access public
