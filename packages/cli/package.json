@@ -22,7 +22,7 @@
     "igit": "./bin/index.mjs"
   },
   "dependencies": {
-    "@doremijs/igit-core": "workspace:*"
+    "@doremijs/igit-core": "workspace:^"
   },
   "engines": {
     "node": ">=10.0.0"
