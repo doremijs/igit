@@ -11,7 +11,12 @@
   "files": [
     "igit-core.linux-x64-musl.node"
   ],
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erguotou520/igit.git",
+    "directory": "packages/core/npm/linux-x64-musl"
+  },
+  "license": "LGPL-3.0-or-later",
   "engines": {
     "node": ">= 10"
   },

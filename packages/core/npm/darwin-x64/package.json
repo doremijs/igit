@@ -11,7 +11,12 @@
   "files": [
     "igit-core.darwin-x64.node"
   ],
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erguotou520/igit.git",
+    "directory": "packages/core/npm/darwin-x64"
+  },
+  "license": "LGPL-3.0-or-later",
   "engines": {
     "node": ">= 10"
   }
