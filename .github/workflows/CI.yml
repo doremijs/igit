@@ -399,12 +399,12 @@ jobs:
           npm config set provenance true
           if git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$"; then
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-            npm --workspace=@doremijs/igit-core run prepublishOnly
+            npm --workspace=@doremijs/igit-core run prepublishOnly --access public
             npm publish --workspace=@doremijs/igit-core --access public
             npm publish --workspace=@doremijs/igit-cli --access public
           elif git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+"; then
             echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> ~/.npmrc
-            npm --workspace=@doremijs/igit-core run prepublishOnly
+            npm --workspace=@doremijs/igit-core run prepublishOnly --access public
             npm publish --workspace=@doremijs/igit-core --tag next --access public
             npm publish --workspace=@doremijs/igit-cli --tag next --access public
           else
