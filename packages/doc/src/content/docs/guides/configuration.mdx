@@ -1,0 +1,130 @@
+---
+title: 配置指南
+description: 了解如何配置 igit 以满足你的需求
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## 配置文件
+
+igit 使用 `.config/igit.yaml` 作为配置文件。当你运行 `igit init` 时，会自动创建一个默认的配置文件。
+
+### 基本配置结构
+
+```yaml
+# Git Hooks 配置
+hooks:
+  # 是否启用 hooks
+  enabled: true
+  # hooks 配置
+  hooks:
+    # pre-commit hook 配置
+    pre-commit:
+      - lint-staged
+      - npm test
+    # commit-msg hook 配置
+    commit-msg:
+      - npx commitlint --edit
+    # pre-push hook 配置
+    pre-push:
+      - npm test
+
+# 暂存区 hooks 配置
+staged_hooks:
+  # 是否启用暂存区 hooks
+  enabled: true
+  # 暂存区规则
+  rules:
+    "*.{js,ts}":
+      - eslint --fix
+      - prettier --write
+    "*.{css,less,scss}":
+      - stylelint --fix
+
+
+# AI 配置
+ai:
+  # 是否启用 AI 功能
+  enabled: true
+  # OpenAI API 基础 URL
+  baseUrl: https://api.openai.com
+  # OpenAI API Key
+  apiKey: your-api-key
+  # 使用的模型
+  model: gpt-3.5-turbo
+  # AI 响应使用的语言
+  respondIn: 中文
+```
+
+## 配置项说明
+
+### Hooks 配置
+
+- `hooks.enabled`: 是否启用所有 Git hooks
+- `hooks.hooks`: 各个 hook 的具体配置，支持字符串或字符串数组形式的命令
+
+支持的 hooks 包括：
+- `applypatch-msg`
+- `pre-applypatch`
+- `pre-commit`
+- `pre-merge-commit`
+- `prepare-commit-msg`
+- `commit-msg`
+- `post-commit`
+- `pre-rebase`
+- `post-checkout`
+- `post-merge`
+- `pre-push`
+- 等等...
+
+### 暂存区 Hooks 配置
+
+- `staged_hooks.enabled`: 是否启用暂存区 hooks
+- `staged_hooks.rules`: 针对不同文件类型的处理规则
+
+### 提交信息配置
+
+- `commit_msg.enabled`: 是否启用提交信息检查
+- `commit_msg.validTypes`: 有效的提交类型列表
+- `commit_msg.prependEmoji`: 是否在提交信息前添加 emoji
+
+### AI 配置
+
+- `ai.enabled`: 是否启用 AI 功能
+- `ai.baseUrl`: OpenAI API 的基础 URL
+- `ai.apiKey`: OpenAI API Key
+- `ai.model`: 使用的 AI 模型
+- `ai.respondIn`: AI 响应使用的语言
+
+<Aside type="caution">
+  请不要将 API Key 直接写在配置文件中，建议使用环境变量 `OPENAI_API_KEY` 来设置。
+</Aside>
+
+## 配置示例
+
+### 配置暂存区检查
+
+```yaml
+staged_hooks:
+  enabled: true
+  rules:
+    "**/*.{js,ts}":
+      - eslint --fix
+      - prettier --write
+    "**/*.vue":
+      - eslint --fix
+      - stylelint --fix
+    "**/*.{css,scss}":
+      - stylelint --fix
+```
+
+
+### 配置 AI 功能
+
+```yaml
+ai:
+  enabled: true
+  baseUrl: https://api.openai.com
+  model: gpt-4
+  respondIn: 中文
+```

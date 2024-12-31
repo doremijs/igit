@@ -1,0 +1,124 @@
+---
+title: AI 提交功能
+description: 深入了解 igit 的 AI 提交功能
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## 功能介绍 🤖
+
+igit 的 AI 提交功能使用先进的 AI 模型来分析你的代码变更，自动生成符合[约定式提交](https://www.conventionalcommits.org/zh-hans/)规范的提交信息。这不仅能节省你的时间，还能确保提交信息的质量和一致性。
+
+## 工作原理 ⚙️
+
+<Steps>
+
+1. **收集变更**
+
+   当你运行 `igit commit` 时，igit 会收集当前的 Git 暂存区（staged）中的所有变更。
+
+2. **分析变更**
+
+   AI 模型会分析这些变更，包括：
+   - 修改的文件类型
+   - 代码的增删改内容
+   - 变更的上下文
+
+3. **生成提交信息**
+
+   基于分析结果，AI 会生成一个符合约定式提交规范的提交信息，包括：
+   - 类型（feat/fix/docs 等）
+   - 作用域（可选）
+   - 描述
+   - 详细说明（如果需要）
+
+4. **确认提交**
+
+   你可以选择接受或修改生成的提交信息。
+
+</Steps>
+
+## 使用方法 📝
+
+### 基本使用
+
+```bash
+# 生成提交信息并等待确认
+igit commit
+
+# 生成提交信息并直接提交
+igit commit -y
+```
+
+### 提交类型
+
+AI 会根据变更内容自动选择最合适的提交类型：
+
+- `feat`: 新功能
+- `fix`: 修复 bug
+- `docs`: 文档更新
+- `style`: 代码格式修改
+- `refactor`: 代码重构
+- `perf`: 性能优化
+- `test`: 测试相关
+- `chore`: 构建过程或辅助工具的变动
+
+<Aside type="tip">
+  AI 会尽可能准确地选择提交类型，但你也可以在确认阶段修改它。
+</Aside>
+
+## 最佳实践 💡
+
+### 1. 保持变更聚焦
+
+每次提交只包含相关的变更，这样 AI 能更准确地理解你的意图。
+
+### 2. 使用暂存区
+
+确保将要提交的文件都已经添加到暂存区：
+
+```bash
+git add <files>
+igit commit
+```
+
+### 3. 审查生成的信息
+
+虽然 AI 通常能生成高质量的提交信息，但最好还是快速审查一下，确保它准确反映了你的意图。
+
+## 常见问题 ❓
+
+### Q: 为什么有时候生成的提交信息不够准确？
+
+A: 这可能是因为：
+- 变更内容过于复杂或分散
+- 暂存区包含了不相关的变更
+- AI 模型无法完全理解特定的业务上下文
+
+### Q: 如何改进生成的提交信息质量？
+
+1. 确保每次提交的变更都是相关的
+2. 在配置文件中使用更强大的 AI 模型（如 GPT-4）
+3. 提供更多的上下文信息
+
+## 配置选项 ⚙️
+
+在 `.config/igit.yaml` 中可以自定义 AI 提交功能：
+
+```yaml
+ai:
+  # 是否启用 AI 提交功能，默认关闭
+  enabled: true
+  # Base URL，默认使用OpenAI的API
+  baseUrl: https://api.deepseek.com
+  # 选择 AI 模型
+  model: gpt-4
+  # 响应语言，默认中文
+  respondIn: 中文
+  # API Key，请不要将API Key直接写入配置文件，请使用环境变量 OPENAI_API_KEY=xxxxx来设置
+  # apiKey: xxxxx
+```
+
+<Aside type="caution">
+  请不要将 API Key 直接写在配置文件中，建议使用环境变量 `OPENAI_API_KEY` 来设置。
+</Aside>

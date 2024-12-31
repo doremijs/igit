@@ -1,0 +1,76 @@
+---
+title: 快速开始
+description: 学习如何在你的项目中使用 igit
+---
+
+import { Steps, Tabs, TabItem } from '@astrojs/starlight/components';
+
+## 安装
+
+<Steps>
+
+1. 首先，使用你喜欢的包管理器安装 igit：
+
+<Tabs>
+  <TabItem label="npm">
+  ```bash
+  npm install -g @doremijs/igit-cli
+  ```
+  </TabItem>
+  <TabItem label="yarn">
+  ```bash
+  yarn global add @doremijs/igit-cli
+  ```
+  </TabItem>
+  <TabItem label="pnpm">
+  ```bash
+  pnpm add -g @doremijs/igit-cli
+  ```
+  </TabItem>
+</Tabs>
+
+2. 在你的 Git 项目中初始化 igit：
+
+```bash
+cd your-project
+igit init
+```
+
+3. 安装 Git Hooks：
+
+```bash
+igit install
+```
+
+</Steps>
+
+## 基本使用
+
+### AI 提交信息生成
+
+当你需要提交代码时，只需运行：
+
+```bash
+igit commit
+```
+
+igit 会自动分析你的修改，并生成符合[约定式提交](https://www.conventionalcommits.org/zh-hans/)规范的提交信息。如果你对生成的信息满意，可以使用 `-y` 参数直接提交：
+
+```bash
+igit commit -y
+```
+
+### Git Hooks
+
+igit 会自动安装以下 Git Hooks：
+
+- `pre-commit`: 在提交前运行代码检查并追加 emoji
+- `commit-msg`: 检查提交信息是否符合规范
+
+你可以通过配置文件自定义这些 hooks 的行为。
+
+## 下一步
+
+- [配置指南](/guides/configuration/) - 了解如何自定义 igit
+- [AI 提交](/guides/ai-commit/) - 深入了解 AI 提交功能
+- [Git Hooks](/guides/hooks/) - 学习如何配置和使用 Git Hooks
