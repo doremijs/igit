@@ -6,3 +6,8 @@ staged_hooks:
 commit_msg:
   enabled: true
   prependEmoji: true
+ai:
+  enabled: true
+  baseUrl: https://api.deepseek.com
+  apiKey:
+  model: deepseek-chat

@@ -26,6 +26,10 @@ pub fn run_hook(hook_name: String, args: Vec<String>) -> Result<()> {
 }
 
 #[napi]
-pub fn auto_commit() -> Result<()> {
-  auto_commit::generate_commit_message().map_err(|e| Error::from_reason(e.to_string()))
+pub async fn auto_commit(commit: bool) -> Result<()> {
+  let ret = auto_commit::generate_commit_message(commit).await;
+  if let Err(e) = ret {
+    eprintln!("{}", e);
+  }
+  Ok(())
 }

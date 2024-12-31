@@ -1,15 +1,15 @@
+use crate::git;
 use dirs_next::home_dir;
 use serde::{Deserialize, Serialize};
 use serde_yaml;
 use std::collections::HashMap;
 use std::fs;
 use std::path::Path;
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(untagged)]
 pub enum HookCommand {
-    Single(String),
-    Multiple(Vec<String>),
+  Single(String),
+  Multiple(Vec<String>),
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -41,24 +41,52 @@ pub struct StagedHooksConfig {
 pub struct CommitLintConfig {
   #[serde(default)]
   pub enabled: bool,
-  #[serde(default, rename = "validTypes", skip_serializing_if = "Option::is_none")]
+  #[serde(
+    default,
+    rename = "validTypes",
+    skip_serializing_if = "Option::is_none"
+  )]
   pub valid_types: Option<Vec<String>>,
   #[serde(default, rename = "prependEmoji")]
   pub prepend_emoji: bool,
+}
+
+fn default_base_url() -> Option<String> {
+  Some("https://api.openai.com/v1".to_string())
+}
+
+fn default_model() -> Option<String> {
+  Some("gpt-3.5-turbo".to_string())
+}
+
+fn default_respond_in() -> Option<String> {
+  Some("English".to_string())
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct AIConfig {
   #[serde(default)]
   pub enabled: bool,
-  #[serde(default = "https://api.openai.com/v1", rename = "baseUrl", skip_serializing_if = "Option::is_none")]
+  #[serde(
+    default = "default_base_url",
+    rename = "baseUrl",
+    skip_serializing_if = "Option::is_none"
+  )]
   pub base_url: Option<String>,
   #[serde(default, rename = "apiKey", skip_serializing_if = "Option::is_none")]
   pub api_key: Option<String>,
-  #[serde(default = "gpt-3.5-turbo", rename = "model", skip_serializing_if = "Option::is_none")]
+  #[serde(
+    default = "default_model",
+    rename = "model",
+    skip_serializing_if = "Option::is_none"
+  )]
   pub model: Option<String>,
-  #[serde(default = "English", rename = "respondIn", skip_serializing_if = "Option::is_none")]
-  pub respond_in: Option<String>
+  #[serde(
+    default = "default_respond_in",
+    rename = "respondIn",
+    skip_serializing_if = "Option::is_none"
+  )]
+  pub respond_in: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
@@ -83,7 +111,9 @@ pub fn init() -> std::io::Result<()> {
     fs::create_dir_all(config_dir)?;
   }
 
-  fs::write(config_file, "# yaml-language-server: $schema=https://igit.erguotou.me/schema/0.0.1/schema.json
+  fs::write(
+    config_file,
+    "# yaml-language-server: $schema=https://igit.erguotou.me/schema/0.0.2/schema.json
 hooks:
   enabled: true
   hooks: {}
@@ -95,7 +125,14 @@ staged_hooks:
 commit_msg:
   enabled: true
   prependEmoji: true
-")
+ai:
+  enabled: true
+  baseUrl: https://api.deepseek.com
+  apiKey:
+  model: deepseek-chat
+  respondIn: 中文
+",
+  )
 }
 
 pub fn parse() -> Result<IgitConfig, String> {
@@ -121,5 +158,21 @@ pub fn parse() -> Result<IgitConfig, String> {
   let file_content = ret.unwrap();
   let config: IgitConfig = serde_yaml::from_str(&file_content)
     .expect("Failed to parse config, please check your config file.");
+  Ok(config)
+}
+
+pub fn check() -> Result<IgitConfig, String> {
+  let git_exists = git::is_git_installed();
+
+  if !git_exists {
+    return Err("Git is not installed".into());
+  }
+
+  let is_git_repo = git::is_git_repo();
+
+  if !is_git_repo {
+    return Err("Current directory is not a git repository".into());
+  }
+  let config = parse()?;
   Ok(config)
 }

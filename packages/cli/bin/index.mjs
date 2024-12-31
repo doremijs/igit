@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
+// src/index.ts
 import { readFile } from "node:fs/promises";
-import { init, install, runHook } from "@doremijs/igit-core";
+import { autoCommit, init, install, runHook } from "@doremijs/igit-core";
 var args = process.argv.slice(2);
 var helpMessage = `Usage: igit <command> [options]
 
@@ -9,6 +10,7 @@ Commands:
   init    Initialize the igit configuration file
   install Install hooks to the git repository
   run     Run a specific hook
+  commit  Auto commit with ai
   version Print the version`;
 async function start() {
   if (args.length === 0) {
@@ -28,9 +30,12 @@ async function start() {
       try {
         runHook(options[0], options.slice(1));
       } catch (error) {
-        console.error('\x1b[31mHooks failed to run\x1b[0m');
+        console.error("\x1B[31mHooks failed to run\x1B[0m");
         process.exit(1);
       }
+      break;
+    case "commit":
+      autoCommit(options.includes("-y"));
       break;
     case "version": {
       const pkg = await readFile("../package.json", "utf-8");

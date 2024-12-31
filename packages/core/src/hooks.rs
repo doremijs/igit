@@ -1,8 +1,7 @@
 use crate::command::run_command;
-use crate::{
-  config::{parse, HookCommand, IgitConfig},
-  git::{is_git_installed, is_git_repo},
-};
+use crate::config;
+use crate::config::HookCommand;
+use crate::config::IgitConfig;
 use fast_glob::glob_match;
 use std::error::Error;
 use std::fs;
@@ -10,18 +9,7 @@ use std::path::Path;
 use std::process::Command;
 
 pub fn install() -> Result<(), Box<dyn Error>> {
-  let git_exists = is_git_installed();
-
-  if !git_exists {
-    return Err("Git is not installed".into());
-  }
-
-  let is_git_repo = is_git_repo();
-
-  if !is_git_repo {
-    return Err("Current directory is not a git repository".into());
-  }
-  let config = parse()?;
+  let config = config::check()?;
   let git_config_output = Command::new("git")
     .arg("config")
     .arg("--get")
@@ -313,7 +301,7 @@ fn run_commands_for_staged_files(config: &IgitConfig) -> Result<(), Box<dyn Erro
  * run hooks
  */
 pub fn run_hook(hook_name: &str, args: &Vec<String>) -> Result<(), Box<dyn Error>> {
-  let config = parse()?;
+  let config = config::check()?;
   // pre-commit hook
   if hook_name == "pre-commit" {
     if config.staged_hooks.enabled {

@@ -1,33 +1,58 @@
-use std::io::Read;
-use std::process::Command;
-use serde_json::{json, Value};
+use crate::command::run_command;
+use crate::config;
+use reqwest::Client;
+use serde_json::json;
 use std::env;
-use crate::config::IgitConfig;
+use std::process::{Command, Stdio};
+use spinners::{Spinner, Spinners};
 
-pub struct CommitMessage {
-    pub description: String,
-    pub body: Option<String>,
-    pub footers: Option<Vec<String>>
-}
-
-pub fn generate_commit_message(config: &IgitConfig) -> Result<CommitMessage, String> {
+pub async fn generate_commit_message(commit: bool) -> Result<(), String> {
+    let config = config::check()?;
+    if !config.ai.enabled {
+        return Err("Auto commit is not enabled".to_string());
+    }
     // 获取git diff内容
     let diff = get_git_diff()?;
     if diff.is_empty() {
         return Err("No changes to commit".to_string());
     }
 
-    // Build prompt
-    let mut system_prompt = "You are a git commit message generator. Please generate a standardized commit message based on the git diff, with the following information:\n\
-        - type: build, chore, ci, docs, feat, fix, perf, refactor, revert, style, test\n\
-        - scope: Optional scope of the commit, like 'cli', 'core', 'ui', 'api', etc.\n\
-        - description: A short one-line description starting with a present-tense verb\n\
-        - body: Optional detailed explanation\n\
-        - footers: Optional footers like 'BREAKING CHANGE: `extends` key in config file is now used for extending other config files'";
+    let api_key = config
+        .ai
+        .api_key
+        .or_else(|| env::var("OPENAI_API_KEY").ok())
+        .ok_or("API key not found")?;
+    let base_url = config.ai.base_url.unwrap();
+    let model = config.ai.model.unwrap();
 
-    if let Some(lang) = config.ai.respond_in {
-        system_prompt = &format!("{}\nPlease always generate the commit message in {} language", system_prompt, lang);
-    }
+    // Build prompt
+    let system_prompt = "You are a git commit message generator. Generate a concise, standardized commit message directly with no format wrapper based on the git diff. Focus on the overall purpose or functionality of the changes, rather than listing individual file changes. Follow these guidelines:\n\
+    - **Type**: Choose one of the following: build, chore, ci, docs, feat, fix, perf, refactor, revert, style, test.\n\
+    - **Scope**: Optional scope of the commit, like 'cli', 'core', 'ui', 'api', etc.\n\
+    - **Description**: A short one-line description starting with a present-tense verb, summarizing the overall change.\n\
+    - **Body**: Optional detailed explanation, focusing on the 'why' and 'how' of the change, not the 'what'.\n\
+    - **Footers**: Optional footers like 'BREAKING CHANGE: `extends` key in config file is now used for extending other config files'.\n\
+    \n\
+    The commit message should follow this format:\n\
+    <type>[optional scope]: <description>\n\
+    \n\
+    [optional body]\n\
+    \n\
+    [optional footer(s)]\n\
+    \n\
+    **Important**:\n\
+    - Do not list individual file changes.\n\
+    - Focus on the high-level purpose of the commit.\n\
+    - Keep the description concise and meaningful.\n\
+    - Only include a body or footer if they add significant value.";
+    let system_prompt = if let Some(lang) = config.ai.respond_in {
+        format!(
+            "{}\nPlease always generate the commit message in {} language",
+            system_prompt, lang
+        )
+    } else {
+        system_prompt.to_string()
+    };
 
     let messages = vec![
         json!({
@@ -37,90 +62,71 @@ pub fn generate_commit_message(config: &IgitConfig) -> Result<CommitMessage, Str
         json!({
             "role": "user",
             "content": diff
-        })
+        }),
     ];
 
-    // 调用API
-    let api_key = config.ai.api_key.as_ref()
-        .map(|k| k.to_string())
-        .or_else(|| env::var("OPENAI_API_KEY").ok())
-        .ok_or("API key not found")?;
+    let client = Client::new();
+    let mut spinner = Spinner::new(Spinners::Dots, "Generating commit message...".into());
+    let response = client
+        .post(format!("{}/chat/completions", base_url))
+        .header("Content-Type", "application/json")
+        .header("Authorization", format!("Bearer {}", api_key))
+        .json(&json!({
+            "model": model,
+            "messages": messages,
+            "temperature": 0.0
+        }))
+        .send()
+        .await
+        .map_err(|e| format!("Failed to send request: {}", e))?;
 
-    let base_url = config.ai.base_url.as_ref()
-        .map(|u| u.to_string())
-        .unwrap_or("https://api.openai.com".to_string());
+    let response_json: serde_json::Value = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse response: {}", e))?;
 
-    let model = config.ai.model.as_ref()
-        .map(|m| m.to_string())
-        .unwrap_or("gpt-3.5-turbo".to_string());
+    spinner.stop();
 
-    let client = std::net::TcpStream::connect(base_url.replace("https://", ""))?;
-    let mut stream = std::io::BufWriter::new(client);
-
-    let request = json!({
-        "model": model,
-        "messages": messages,
-        "temperature": 0.7
-    });
-
-    let request_str = format!(
-        "POST /v1/chat/completions HTTP/1.1\r\n\
-         Host: {}\r\n\
-         Content-Type: application/json\r\n\
-         Authorization: Bearer {}\r\n\
-         Content-Length: {}\r\n\
-         \r\n\
-         {}",
-        base_url.replace("https://", ""),
-        api_key,
-        request.to_string().len(),
-        request.to_string()
-    );
-
-    stream.write_all(request_str.as_bytes())?;
-    stream.flush()?;
-
-    let mut response = String::new();
-    stream.get_mut().read_to_string(&mut response)?;
-
-    // 解析响应
-    let response: Value = serde_json::from_str(&response)?;
-    let content = response["choices"][0]["message"]["content"]
+    let content = response_json["choices"][0]["message"]["content"]
         .as_str()
-        .ok_or("Invalid response format")?;
+        .ok_or("Invalid response format")
+        .map_err(|e| format!("Failed to parse response: {}", e))?
+        .to_string();
 
-    // 解析生成的commit message
-    let lines: Vec<&str> = content.lines().collect();
-    let mut description = String::new();
-    let mut body = None;
-    let mut footers = None;
-
-    for line in lines {
-        if line.starts_with("description:") {
-            description = line.replace("description:", "").trim().to_string();
-        } else if line.starts_with("body:") {
-            body = Some(line.replace("body:", "").trim().to_string());
-        } else if line.starts_with("footers:") {
-            footers = Some(vec![line.replace("footers:", "").trim().to_string()]);
-        }
+    println!("{}", content);
+    if content.is_empty() {
+        return Err("No commit message generated".to_string());
     }
-
-    Ok(CommitMessage {
-        description,
-        body,
-        footers
-    })
+    if commit {
+        run_command("git", &format!("commit -m \"{}\"", content))
+            .map_err(|e| format!("Failed to commit: {}", e))?;
+    } else {
+        let mut ps_commit = Command::new("git")
+            .arg("commit")
+            .arg("-e")
+            .arg("-m")
+            .arg(content)
+            .stdin(Stdio::inherit())
+            .stdout(Stdio::inherit())
+            .stderr(Stdio::inherit())
+            .spawn()
+            .unwrap();
+        ps_commit.wait().unwrap();
+    }
+    Ok(())
 }
 
 fn get_git_diff() -> Result<String, String> {
     let output = Command::new("git")
-        .args(&["diff",
+        .args(&[
+            "diff",
             "--staged",
             "--ignore-all-space",
             "--diff-algorithm=minimal",
             "--function-context",
             "--no-ext-diff",
-            "--no-color"])
+            "--no-color",
+        ])
         .output()
         .map_err(|e| format!("Failed to get git diff: {}", e))?;
 
@@ -130,4 +136,3 @@ fn get_git_diff() -> Result<String, String> {
 
     Ok(String::from_utf8_lossy(&output.stdout).to_string())
 }
-

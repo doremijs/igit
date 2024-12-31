@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { readFile } from 'node:fs/promises'
-import { init, install, runHook } from "@doremijs/igit-core";
+import { init, install, runHook, autoCommit } from "@doremijs/igit-core";
 
 const args = process.argv.slice(2);
 
@@ -11,6 +11,7 @@ Commands:
   init    Initialize the igit configuration file
   install Install hooks to the git repository
   run     Run a specific hook
+  commit  Auto commit with ai
   version Print the version`;
 
 async function start() {
@@ -36,6 +37,9 @@ async function start() {
         process.exit(1)
       }
 			break;
+    case "commit":
+      autoCommit(options.includes('-y'));
+      break;
 		case "version": {
 			const pkg = await readFile("../package.json", "utf-8");
 			const version = JSON.parse(pkg).version;

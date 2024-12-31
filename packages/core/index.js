@@ -310,8 +310,9 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { init, install, runHook } = nativeBinding
+const { init, install, runHook, autoCommit } = nativeBinding
 
 module.exports.init = init
 module.exports.install = install
 module.exports.runHook = runHook
+module.exports.autoCommit = autoCommit

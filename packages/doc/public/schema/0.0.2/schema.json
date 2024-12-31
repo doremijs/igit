@@ -1,0 +1,151 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "hooks": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "hooks": {
+          "type": "object",
+          "properties": {
+            "applypatch-msg": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "pre-applypatch": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "pre-commit": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "pre-merge-commit": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "prepare-commit-msg": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "commit-msg": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "post-commit": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "pre-rebase": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "post-checkout": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "post-merge": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "pre-push": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "pre-receive": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "update": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "proc-receive": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "post-receive": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "post-update": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "reference-transaction": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "push-to-checkout": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "pre-auto-gc": {
+              "$ref": "#/definitions/stringOrStringArray"
+            },
+            "post-rewrite": {
+              "$ref": "#/definitions/stringOrStringArray"
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "staged_hooks": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "rules": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/stringOrStringArray"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "commit_msg": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "validTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prependEmoji": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ai": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "baseUrl": {
+          "type": "string"
+        },
+        "apiKey": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "respondIn": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "stringOrStringArray": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      ]
+    }
+  },
+  "additionalProperties": false
+}

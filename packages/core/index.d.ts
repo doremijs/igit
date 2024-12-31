@@ -6,3 +6,4 @@
 export declare function init(): void
 export declare function install(): void
 export declare function runHook(hookName: string, args: Array<string>): void
+export declare function autoCommit(commit: boolean): Promise<void>
