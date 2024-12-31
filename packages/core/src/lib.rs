@@ -8,6 +8,7 @@ mod config;
 mod git;
 mod hooks;
 mod command;
+mod auto_commit;
 
 #[napi]
 pub fn init() -> Result<()> {
@@ -22,4 +23,9 @@ pub fn install() -> Result<()> {
 #[napi]
 pub fn run_hook(hook_name: String, args: Vec<String>) -> Result<()> {
   hooks::run_hook(&hook_name, &args).map_err(|e| Error::from_reason(e.to_string()))
+}
+
+#[napi]
+pub fn auto_commit() -> Result<()> {
+  auto_commit::generate_commit_message().map_err(|e| Error::from_reason(e.to_string()))
 }

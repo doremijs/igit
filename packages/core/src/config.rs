@@ -48,6 +48,20 @@ pub struct CommitLintConfig {
 }
 
 #[derive(Serialize, Deserialize, Debug, Default)]
+pub struct AIConfig {
+  #[serde(default)]
+  pub enabled: bool,
+  #[serde(default = "https://api.openai.com/v1", rename = "baseUrl", skip_serializing_if = "Option::is_none")]
+  pub base_url: Option<String>,
+  #[serde(default, rename = "apiKey", skip_serializing_if = "Option::is_none")]
+  pub api_key: Option<String>,
+  #[serde(default = "gpt-3.5-turbo", rename = "model", skip_serializing_if = "Option::is_none")]
+  pub model: Option<String>,
+  #[serde(default = "English", rename = "respondIn", skip_serializing_if = "Option::is_none")]
+  pub respond_in: Option<String>
+}
+
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct IgitConfig {
   #[serde(default)]
   pub hooks: HooksConfig,
@@ -55,6 +69,8 @@ pub struct IgitConfig {
   pub staged_hooks: StagedHooksConfig,
   #[serde(default)]
   pub commit_msg: CommitLintConfig,
+  #[serde(default)]
+  pub ai: AIConfig,
 }
 
 pub fn init() -> std::io::Result<()> {
