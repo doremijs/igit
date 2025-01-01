@@ -58,28 +58,6 @@ pub fn install() -> Result<(), Box<dyn Error>> {
     for hook_name in hooks.iter() {
       let hook_path = hooks_dir.join(hook_name);
       let bin_entry_path = Path::new("./node_modules/@doremijs/igit-cli/bin/index.mjs");
-      // if !bin_entry_path.exists() {
-      //   let global_dirs = vec!["bun", "deno", "pnpm", "yarn", "node"];
-      //   let global_paths = vec![
-      //       ".config/yarn/global/node_modules/@doremijs/igit-cli/bin/index.mjs",
-      //       ".local/share/pnpm/global/node_modules/@doremijs/igit-cli/bin/index.mjs",
-      //       ".config/bun/global/node_modules/@doremijs/igit-cli/bin/index.mjs",
-      //       ".deno/bin/index.mjs",
-      //       ".npm-global/lib/node_modules/@doremijs/igit-cli/bin/index.mjs",
-      //   ];
-      //   for dir in global_dirs {
-      //       for path in &global_paths {
-      //           let global_path = Path::new(&format!("{}/.{}", dir, path));
-      //           if global_path.exists() {
-      //               bin_entry_path = global_path;
-      //               break;
-      //           }
-      //       }
-      //       if bin_entry_path != Path::new("./node_modules/@doremijs/igit-cli/bin/index.mjs") {
-      //           break;
-      //       }
-      //   }
-      // }
       let hook_content = format!(
         r#"#!/bin/sh
 run_command() {{
@@ -97,12 +75,6 @@ run_command {} run "{}" "$@"
         bin_entry_path.to_string_lossy(),
         hook_name
       );
-      //       let hook_content = format!(
-      // r#"#!/bin/sh
-      // npx @doremijs/igit-cli run "{}" "$@"
-      // "#,
-      //         hook_name
-      //       );
       fs::write(&hook_path, hook_content)?;
       Command::new("chmod").arg("+x").arg(&hook_path).output()?;
     }

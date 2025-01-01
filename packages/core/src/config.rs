@@ -20,15 +20,6 @@ pub struct HooksConfig {
   pub hooks: HashMap<String, HookCommand>,
 }
 
-// impl Default for HooksConfig {
-//   fn default() -> Self {
-//     Self {
-//       enabled: false,
-//       hooks: HashMap::new(),
-//     }
-//   }
-// }
-
 #[derive(Serialize, Deserialize, Debug, Default)]
 pub struct StagedHooksConfig {
   #[serde(default)]
@@ -130,7 +121,7 @@ ai:
   baseUrl: https://api.deepseek.com
   apiKey:
   model: deepseek-chat
-  respondIn: 中文
+  respondIn: English
 ",
   )
 }
