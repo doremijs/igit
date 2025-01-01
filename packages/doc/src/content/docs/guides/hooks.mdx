@@ -1,0 +1,98 @@
+---
+title: Git Hooks
+description: Learn how to use and configure iGit's Git Hooks
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## What are Git Hooks? 🎣
+
+Git Hooks are scripts that automatically execute when specific events occur in a Git repository. iGit provides a set of pre-configured Git Hooks and various user-defined hook scripts to help you standardize your code commit process and ensure code quality.
+
+```yaml
+hooks:
+  enabled: true
+  hooks:
+    pre-commit:
+      - npm run test
+      - npm run build
+```
+
+## Configuration Guide ⚙️
+
+### Git Hooks Configuration
+
+```yaml
+hooks:
+  # Enable hooks
+  enabled: true
+  # Hooks configuration
+  hooks:
+    # Can configure any Git hook
+    pre-commit:
+      - command1
+      - command2
+    commit-msg:
+      - command1
+    pre-push:
+      - command1
+```
+
+### Staged Hooks Configuration
+
+Staged hooks are iGit's hook configuration for executing commands before commits, typically used for code checking and formatting of modified files.
+
+```yaml
+staged_hooks:
+  # Enable staged hooks
+  enabled: true
+  # Rules for different file types
+  rules:
+    "**/*.{js,ts}":
+      - eslint --fix
+    "**/*.{css,scss}":
+      - stylelint --fix
+```
+
+### Git Commit Message Constraints
+
+We follow the [Conventional Commits](https://www.conventionalcommits.org/) specification and use the `commit-msg` hook to enforce commit messages. You can enable this feature with a simple configuration.
+
+```yaml
+commit_msg:
+  enabled: true
+```
+
+### Git Commit Message Emoji Prepending
+
+iGit provides a `commit-msg` hook to enforce commit messages and supports adding emojis based on the corresponding type.
+
+```yaml
+commit_msg:
+  enabled: true
+  prependEmoji: true
+```
+
+### Command Execution
+
+- Commands are executed in the order specified in the configuration file
+- If any command fails (returns non-zero status code), the hook will stop executing
+- Supports all shell commands and `npm` scripts
+
+## Best Practices 💡
+
+### 1. Code Checking
+
+```yaml
+hooks:
+  enabled: true
+  hooks:
+    pre-push:
+      - npm run test:coverage
+      - npm run build
+staged_hooks:
+  enabled: true
+  rules:
+    '**/*.{css,scss,less,styl,stylus}': stylelint --fix
+    '**/*.{js,jsx,ts,tsx}': biome check --write
+```

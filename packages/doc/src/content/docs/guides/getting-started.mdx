@@ -1,0 +1,74 @@
+---
+title: Getting Started
+description: Learn how to use iGit in your project
+---
+
+import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
+
+## Installation
+
+<Steps>
+
+1. First, install `@doremijs/igit-cli` using your preferred package manager:
+
+    <Tabs>
+      <TabItem label="npm">
+      ```bash
+      npm install @doremijs/igit-cli
+      ```
+      </TabItem>
+      <TabItem label="yarn">
+      ```bash
+      yarn add @doremijs/igit-cli
+      ```
+      </TabItem>
+      <TabItem label="pnpm">
+      ```bash
+      pnpm add @doremijs/igit-cli
+      ```
+      </TabItem>
+    </Tabs>
+
+2. Initialize iGit in your `Git` project:
+
+    ```bash
+    npx igit init
+    ```
+    Check the generated configuration file `.config/igit.yaml` and configure it according to your project needs ✨ (The `yaml` file comes with schema hints for editing 🎉).
+
+    <Aside>We don't want to "pollute" the project root directory anymore, so we use the `.config` directory to store configuration files.</Aside>
+
+3. Install Git Hooks:
+
+    ```bash
+    npx igit install
+    ```
+
+4. Modify code and commit
+
+    ```bash
+    # update some code
+    git add .
+    git commit -m "feat: update some code"
+    ```
+
+    iGit will execute `lint-staged` code checks, add emojis, and perform other operations according to the configuration file above.
+
+5. Try AI-powered commits
+
+    You can use iGit's AI commit feature, which automatically generates commit messages based on your code. First, you need to add AI-related configuration to the config file, then execute:
+
+    ```bash
+    git add .
+    npx igit commit -y
+    ```
+
+    iGit will automatically summarize your changes and generate a commit message that follows the [Conventional Commits](https://www.conventionalcommits.org/) specification.
+
+</Steps>
+
+## Next Steps
+
+- [Git Hooks](/guides/hooks/) - Learn how to configure and use Git Hooks
+- [AI Commit](/guides/ai-commit/) - Deep dive into the AI commit feature
+- [Configuration Guide](/guides/configuration/) - Learn how to customize iGit

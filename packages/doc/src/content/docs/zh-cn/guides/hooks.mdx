@@ -7,7 +7,7 @@ import { Aside } from '@astrojs/starlight/components';
 
 ## 什么是 Git Hooks? 🎣
 
-Git Hooks 是在 Git 仓库中特定事件发生时自动执行的脚本。igit 提供了一套预配置的 Git Hooks，以及各种用户定义钩子脚本，帮助你规范化代码提交流程，确保代码质量。
+Git Hooks 是在 Git 仓库中特定事件发生时自动执行的脚本。iGit 提供了一套预配置的 Git Hooks，以及各种用户定义钩子脚本，帮助你规范化代码提交流程，确保代码质量。
 
 ```yaml
 hooks:
@@ -40,7 +40,7 @@ hooks:
 
 ### 暂存区 Hooks 配置
 
-暂存区 hooks 是 `iGit` 提供的用来在提交前执行命令的钩子配置，一般可以在这个阶段对修改的文件执行代码检查和格式化。
+暂存区 hooks 是 iGit 提供的用来在提交前执行命令的钩子配置，一般可以在这个阶段对修改的文件执行代码检查和格式化。
 
 ```yaml
 staged_hooks:
@@ -54,7 +54,7 @@ staged_hooks:
       - stylelint --fix
 ```
 
-### git 提交信息约束
+### Git 提交信息约束
 
 我们遵守 [Conventional Commits](https://www.conventionalcommits.org/zh-hans/) 规范，并使用 `commit-msg` 钩子来约束提交信息。你可以通过简单的配置来启用该功能。
 
@@ -63,9 +63,9 @@ commit_msg:
   enabled: true
 ```
 
-### git 提交信息追加 emoji
+### Git 提交信息追加 Emoji
 
-`iGit` 提供了 `commit-msg` 钩子来约束提交信息，并支持根据对应的 type 追加 emoji。
+iGit 提供了 `commit-msg` 钩子来约束提交信息，并支持根据对应的 type 追加 emoji。
 
 ```yaml
 commit_msg:
@@ -77,12 +77,11 @@ commit_msg:
 
 - 命令按照配置文件中的顺序依次执行
 - 如果任何命令执行失败（返回非零状态码），hook 将终止执行
-- 支持所有 shell 命令和 npm 脚本
+- 支持所有 shell 命令和 `npm` 脚本
 
 ## 最佳实践 💡
 
 ### 1. 代码检查
-
 
 ```yaml
 hooks:

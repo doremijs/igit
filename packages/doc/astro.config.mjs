@@ -14,7 +14,7 @@ export default defineConfig({
 			locales: {
 				root: {
 					label: 'English',
-					lang: 'en',
+          lang: 'en',
 				},
 				'zh-cn': {
 					label: '简体中文',
@@ -25,7 +25,6 @@ export default defineConfig({
 				github: 'https://github.com/doremijs/igit',
 			},
 			sidebar: [
-				// English sidebar
 				{
 					label: 'Guides',
 					translations: {

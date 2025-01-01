@@ -9,7 +9,7 @@ import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
 <Steps>
 
-1. 首先，使用你喜欢的包管理器安装 igit：
+1. 首先，使用你喜欢的包管理器安装 `@doremijs/igit-cli`：
 
     <Tabs>
       <TabItem label="npm">
@@ -29,14 +29,14 @@ import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
       </TabItem>
     </Tabs>
 
-2. 在你的 Git 项目中初始化 igit：
+2. 在你的 `Git` 项目中初始化 iGit：
 
     ```bash
     npx igit init
     ```
-    查看生成的配置文件 `.config/igit.yaml`，根据项目情况进行配置 ✨（yaml 文件也有 schema 编写提示哦 🎉）。
+    查看生成的配置文件 `.config/igit.yaml`，根据项目情况进行配置 ✨（`yaml` 文件也有 `schema` 编写提示哦 🎉）。
 
-    <Aside>我们不希望再"污染"项目根目录了，所以我们使用`.config`目录来存放配置文件。</Aside>
+    <Aside>我们不希望再"污染"项目根目录了，所以我们使用 `.config` 目录来存放配置文件。</Aside>
 
 3. 安装 Git Hooks：
 
@@ -52,18 +52,18 @@ import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
     git commit -m "feat: update some code"
     ```
 
-    `iGit`会根据上面的配置文件执行`lint-staged`代码检查、添加 emoji 等操作。
+    iGit 会根据上面的配置文件执行 `lint-staged` 代码检查、添加 emoji 等操作。
 
-5. 尝试使用AI提交
+5. 尝试使用 AI 提交
 
-    你可以使用`iGit`的AI提交功能，它会根据你的代码自动生成提交信息，首先你需要在配置文件中追加 AI 相关配置，然后执行。
+    你可以使用 iGit 的 AI 提交功能，它会根据你的代码自动生成提交信息，首先你需要在配置文件中追加 AI 相关配置，然后执行。
 
     ```bash
     git add .
     npx igit commit -y
     ```
 
-    `iGit`会自动帮你总结提交信息，并生成符合[约定式提交](https://www.conventionalcommits.org/zh-hans/)规范的提交信息。
+    iGit 会自动帮你总结提交信息，并生成符合[约定式提交](https://www.conventionalcommits.org/zh-hans/)规范的提交信息。
 
 </Steps>
 
@@ -71,4 +71,4 @@ import { Steps, Tabs, TabItem, Aside } from '@astrojs/starlight/components';
 
 - [Git Hooks](../hooks/) - 学习如何配置和使用 Git Hooks
 - [AI 提交](../ai-commit/) - 深入了解 AI 提交功能
-- [配置指南](../configuration/) - 了解如何自定义 igit
+- [配置指南](../configuration/) - 了解如何自定义 iGit

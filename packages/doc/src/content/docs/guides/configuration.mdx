@@ -1,0 +1,102 @@
+---
+title: Configuration Guide
+description: Learn how to configure iGit to meet your needs
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Configuration File
+
+iGit uses `.config/igit.yaml` as its configuration file. When you run `igit init`, a default configuration file will be created automatically.
+
+### Basic Configuration Structure
+
+```yaml
+# Git Hooks configuration
+hooks:
+  # Enable hooks
+  enabled: true
+  # Hooks configuration
+  hooks:
+    # pre-commit hook configuration
+    pre-commit:
+      - lint-staged
+      - npm test
+    # commit-msg hook configuration
+    commit-msg:
+      - npx commitlint --edit
+    # pre-push hook configuration
+    pre-push:
+      - npm test
+
+# Staged hooks configuration
+staged_hooks:
+  # Enable staged hooks
+  enabled: true
+  # Staged rules
+  rules:
+    # We use `fast-glob` from the rust ecosystem for file matching, see https://crates.io/crates/fast-glob for details
+    "**/*.{js,ts}":
+      - eslint --fix
+      - prettier --write
+    "**/*.{css,less,scss}":
+      - stylelint --fix
+
+
+# AI configuration
+ai:
+  # Enable AI features
+  enabled: true
+  # OpenAI API base URL
+  baseUrl: https://api.openai.com
+  # API Key - Do not write your API Key directly in the config file, or exclude igit.yaml from git. Use the OPENAI_API_KEY=xxxxx environment variable instead
+  apiKey: your-api-key
+  # AI model to use
+  model: gpt-3.5-turbo
+  # Language for AI responses
+  respondIn: English
+```
+
+## Configuration Options
+
+### Hooks Configuration
+
+- `hooks.enabled`: Enable all Git hooks
+- `hooks.hooks`: Configuration for each hook, supports commands as strings or arrays
+
+Supports all [git hooks](https://git-scm.com/docs/githooks), including:
+- `applypatch-msg`
+- `pre-applypatch`
+- `pre-commit`
+- `pre-merge-commit`
+- `prepare-commit-msg`
+- `commit-msg`
+- `post-commit`
+- `pre-rebase`
+- `post-checkout`
+- `post-merge`
+- `pre-push`
+- and more...
+
+### Staged Hooks Configuration
+
+- `staged_hooks.enabled`: Enable staged hooks
+- `staged_hooks.rules`: Processing rules for different file types
+
+### Commit Message Configuration
+
+- `commit_msg.enabled`: Enable commit message validation
+- `commit_msg.validTypes`: List of valid commit types
+- `commit_msg.prependEmoji`: Add emoji to commit messages
+
+### AI Configuration
+
+- `ai.enabled`: Enable AI features
+- `ai.baseUrl`: OpenAI API base URL
+- `ai.apiKey`: OpenAI API Key
+- `ai.model`: AI model to use
+- `ai.respondIn`: Language for AI responses
+
+<Aside type="caution">
+Please do not write your API Key directly in the configuration file. Use the `OPENAI_API_KEY` environment variable instead.
+</Aside>

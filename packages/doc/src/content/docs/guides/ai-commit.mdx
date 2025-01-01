@@ -1,0 +1,100 @@
+---
+title: AI Commit Feature
+description: Deep dive into iGit's AI commit functionality
+---
+
+import { Steps, Aside } from '@astrojs/starlight/components';
+
+## Feature Introduction 🤖
+
+iGit's AI commit feature uses advanced AI models to analyze your code changes and automatically generate commit messages that comply with the [Conventional Commits](https://www.conventionalcommits.org/) specification. This not only saves your time but also ensures the quality and consistency of commit messages.
+
+## How It Works ⚙️
+
+<Steps>
+
+1. **Collect Changes**
+
+   When you run `igit commit`, iGit collects all changes in the Git staged area.
+
+2. **Analyze Changes**
+
+   The AI model analyzes these changes, including:
+   - Modified file types
+   - Code additions, deletions, and modifications
+   - Change context
+
+3. **Generate Commit Message**
+
+   Based on the analysis, AI generates a commit message following the conventional commits specification, including:
+   - Type (`feat`/`fix`/`docs` etc.)
+   - Scope (optional)
+   - Description
+   - Detailed explanation (if needed)
+
+4. **Confirm Commit**
+
+   You can choose to accept or modify the generated commit message.
+
+</Steps>
+
+## Usage 📝
+
+### Basic Usage
+
+```bash
+# Generate commit message and wait for confirmation
+igit commit
+
+# Generate commit message and commit directly
+igit commit -y
+```
+
+### Commit Types
+
+AI will automatically select the most appropriate commit type based on the changes:
+
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation updates
+- `style`: Code style changes
+- `refactor`: Code refactoring
+- `perf`: Performance improvements
+- `test`: Test-related changes
+- `chore`: Build process or auxiliary tool changes
+
+<Aside type="tip">
+  AI will try to select the most accurate commit type, but you can modify it during the confirmation phase.
+</Aside>
+
+## Best Practices 💡
+
+### 1. Keep Changes Focused
+
+Include only related changes in each commit, so AI can better understand your intentions.
+
+### 2. Use Staged Area
+
+Make sure all files you want to commit are added to the staged area:
+
+```bash
+git add <files>
+igit commit
+```
+
+### 3. Review Generated Messages
+
+Although AI usually generates high-quality commit messages, it's best to quickly review them to ensure they accurately reflect your intentions.
+
+## Common Questions ❓
+
+### Q: Why are generated commit messages sometimes not accurate enough?
+
+A: This might be due to:
+- Changes being too complex or scattered
+- Staged area containing unrelated changes
+- AI model unable to fully understand specific business context
+
+### Q: How to improve the quality of generated commit messages?
+
+1. Ensure each commit contains only related changes

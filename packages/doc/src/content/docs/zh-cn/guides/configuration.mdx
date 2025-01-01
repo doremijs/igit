@@ -49,7 +49,7 @@ ai:
   enabled: true
   # OpenAI API 基础 URL
   baseUrl: https://api.openai.com
-  # API Key，请不要将API Key直接写入配置文件，或者不将 igit.yaml 加入 git 管理，请使用环境变量 OPENAI_API_KEY=xxxxx来设置
+  # API Key，请不要将 API Key 直接写入配置文件，或者不将 igit.yaml 加入 git 管理，请使用环境变量 OPENAI_API_KEY=xxxxx 来设置
   apiKey: your-api-key
   # 使用的模型
   model: gpt-3.5-turbo
@@ -98,5 +98,5 @@ ai:
 - `ai.respondIn`: AI 响应使用的语言
 
 <Aside type="caution">
-  请不要将 API Key 直接写在配置文件中，建议使用环境变量 `OPENAI_API_KEY` 来设置。
+请注意不要将你的 API Key 直接写入配置文件中。建议使用环境变量 `OPENAI_API_KEY` 来设置。
 </Aside>
