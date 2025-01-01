@@ -1,12 +1,14 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import cloudflare from '@astrojs/cloudflare';
+// import starlightDocSearch from '@astrojs/starlight-docsearch';
 
 // https://astro.build/config
 export default defineConfig({
+  output: 'server',
   vite: {
     ssr: {
-      noExternal: ['@astrojs/starlight'],
+      // noExternal: ['@astrojs/starlight'],
       external: ['node:path', 'node:url']
     }
   },
@@ -75,9 +77,16 @@ export default defineConfig({
 					},
 				}
 			],
+      // plugins: [
+      //   starlightDocSearch({
+      //     appId: 'YOUR_APP_ID',
+      //     apiKey: 'YOUR_SEARCH_API_KEY',
+      //     indexName: 'YOUR_INDEX_NAME',
+      //   }),
+      // ],
 		}),
 	],
 	adapter: cloudflare({
 		imageService: 'cloudflare'
-	})
+	}),
 });
