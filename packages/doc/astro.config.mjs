@@ -1,4 +1,3 @@
-// @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import cloudflare from '@astrojs/cloudflare';
@@ -7,26 +6,73 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: 'iGit Docs',
+			title: {
+				en: 'iGit Docs',
+				'zh-CN': 'iGit 文档'
+			},
+			defaultLocale: 'root',
+			locales: {
+				root: {
+					label: 'English',
+					lang: 'en',
+				},
+				'zh-cn': {
+					label: '简体中文',
+					lang: 'zh-CN',
+				},
+			},
 			social: {
 				github: 'https://github.com/doremijs/igit',
 			},
 			sidebar: [
+				// English sidebar
 				{
 					label: 'Guides',
+					translations: {
+						'zh-CN': '指南',
+					},
 					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: 'Guide', slug: 'guides/getting-started' },
+						{
+              label: 'Getting Started',
+              slug: 'guides/getting-started',
+              translations: {
+                'zh-CN': '快速开始',
+              }
+            },
+            {
+              label: 'Hooks',
+              slug: 'guides/hooks',
+              translations: {
+                'zh-CN': '钩子',
+              }
+            },
+            {
+              label: 'ai-commit',
+              slug: 'guides/ai-commit',
+              translations: {
+                'zh-CN': 'AI 提交',
+              }
+            },
+            {
+              label: 'Configuration',
+              slug: 'guides/configuration',
+              translations: {
+                'zh-CN': '配置',
+              }
+            }
 					],
 				},
 				{
 					label: 'Reference',
 					autogenerate: { directory: 'reference' },
-				},
+					translations: {
+						'zh-CN': '参考',
+					},
+				}
 			],
 		}),
 	],
-  adapter: cloudflare({
-    imageService: 'cloudflare'
-  })
+	adapter: cloudflare({
+		imageService: 'cloudflare'
+	})
 });

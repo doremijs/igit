@@ -1,13 +1,13 @@
 ---
 title: AI 提交功能
-description: 深入了解 igit 的 AI 提交功能
+description: 深入了解 iGit 的 AI 提交功能
 ---
 
 import { Steps, Aside } from '@astrojs/starlight/components';
 
 ## 功能介绍 🤖
 
-igit 的 AI 提交功能使用先进的 AI 模型来分析你的代码变更，自动生成符合[约定式提交](https://www.conventionalcommits.org/zh-hans/)规范的提交信息。这不仅能节省你的时间，还能确保提交信息的质量和一致性。
+iGit 的 AI 提交功能使用先进的 AI 模型来分析你的代码变更，自动生成符合[约定式提交](https://www.conventionalcommits.org/zh-hans/)规范的提交信息。这不仅能节省你的时间，还能确保提交信息的质量和一致性。
 
 ## 工作原理 ⚙️
 
@@ -115,7 +115,7 @@ ai:
   model: gpt-4
   # 响应语言，默认中文
   respondIn: 中文
-  # API Key，请不要将API Key直接写入配置文件，请使用环境变量 OPENAI_API_KEY=xxxxx来设置
+  # API Key，请不要将API Key直接写入配置文件，或者不将 igit.yaml 加入 git 管理，请使用环境变量 OPENAI_API_KEY=xxxxx来设置
   # apiKey: xxxxx
 ```
 
