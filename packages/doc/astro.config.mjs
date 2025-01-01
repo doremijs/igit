@@ -4,6 +4,12 @@ import cloudflare from '@astrojs/cloudflare';
 
 // https://astro.build/config
 export default defineConfig({
+  vite: {
+    ssr: {
+      noExternal: ['@astrojs/starlight'],
+      external: ['node:path', 'node:url']
+    }
+  },
 	integrations: [
 		starlight({
 			title: {
