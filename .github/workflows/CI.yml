@@ -9,7 +9,7 @@ permissions:
 on:
   push:
     branches: [ "main" ]
-    tags: [ "v*" ]
+    # tags: [ "v*" ]
     paths-ignore:
       - packages/doc/**
       - .vscode/**
@@ -50,12 +50,12 @@ jobs:
           - host: ubuntu-latest
             target: x86_64-unknown-linux-gnu
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
-            setup: apt-get update && apt-get install -y pkg-config libssl-dev
+            prepare: apt-get update && apt-get install -y pkg-config libssl-dev
             build: yarn workspace @doremijs/igit-core build --target x86_64-unknown-linux-gnu
           - host: ubuntu-latest
             target: x86_64-unknown-linux-musl
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-            setup: apk add --no-cache openssl-dev pkgconfig
+            prepare: apk add --no-cache openssl-dev pkgconfig
             build: yarn workspace @doremijs/igit-core build --target x86_64-unknown-linux-musl
           - host: macos-latest
             target: aarch64-apple-darwin
@@ -63,12 +63,12 @@ jobs:
           - host: ubuntu-latest
             target: aarch64-unknown-linux-gnu
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
-            setup: apt-get update && apt-get install -y pkg-config libssl-dev
+            prepare: apt-get update && apt-get install -y pkg-config libssl-dev
             build: yarn workspace @doremijs/igit-core build --target aarch64-unknown-linux-gnu
           - host: ubuntu-latest
             target: aarch64-unknown-linux-musl
             docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-            setup: apk add --no-cache openssl-dev pkgconfig
+            prepare: apk add --no-cache openssl-dev pkgconfig
             build: |-
               set -e &&
               rustup target add aarch64-unknown-linux-musl &&
@@ -131,7 +131,7 @@ jobs:
           options: '--user 0:0 -v ${{ github.workspace }}/.cargo-cache/git/db:/usr/local/cargo/git/db -v ${{ github.workspace }}/.cargo/registry/cache:/usr/local/cargo/registry/cache -v ${{ github.workspace }}/.cargo/registry/index:/usr/local/cargo/registry/index -v ${{ github.workspace }}:/build -w /build'
           run: |
             set -e
-            ${{ matrix.settings.setup }}
+            ${{ matrix.settings.prepare }}
             ${{ matrix.settings.build }}
       - name: Build
         run: ${{ matrix.settings.build }}
