@@ -9,6 +9,7 @@ import { init, install, runHook } from '../index.js'
 const testDir = path.join(fileURLToPath(import.meta.url), '../..')
 
 test.beforeEach('mkdir test dir', async (t) => {
+  execSync('git init')
   // await fs.mkdir(testDir, { recursive: true })
   // process.chdir(testDir)
 })
@@ -31,7 +32,6 @@ test.serial('init from native', async(t) => {
 
 test.serial('install hooks', async (t) => {
   try {
-    execSync('git init')
     init()
     install()
     const preCommitPath = '.git/hooks/pre-commit'
@@ -48,7 +48,6 @@ test.serial('install hooks', async (t) => {
 
 test.serial('run hook', async (t) => {
   try {
-    execSync('git init')
     init()
     const configPath = path.join(testDir, '.config/igit.yaml')
     const config = await fs.readFile(configPath, 'utf-8')
