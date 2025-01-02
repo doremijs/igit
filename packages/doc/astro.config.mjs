@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import cloudflare from '@astrojs/cloudflare';
-// import starlightDocSearch from '@astrojs/starlight-docsearch';
+import starlightDocSearch from '@astrojs/starlight-docsearch';
 
 // https://astro.build/config
 export default defineConfig({
@@ -77,13 +77,13 @@ export default defineConfig({
 					},
 				}
 			],
-      // plugins: [
-      //   starlightDocSearch({
-      //     appId: 'YOUR_APP_ID',
-      //     apiKey: 'YOUR_SEARCH_API_KEY',
-      //     indexName: 'YOUR_INDEX_NAME',
-      //   }),
-      // ],
+      plugins: [
+        starlightDocSearch({
+          appId: 'H73GHR1OE5',
+          apiKey: process.env.DOCSEARCH_API_KEY,
+          indexName: 'igit-erguotou',
+        }),
+      ],
 		}),
 	],
 	adapter: cloudflare({
