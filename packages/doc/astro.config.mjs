@@ -6,6 +6,7 @@ import starlightDocSearch from '@astrojs/starlight-docsearch';
 // https://astro.build/config
 export default defineConfig({
   output: 'server',
+  site: 'https://igit.erguotou.me',
   vite: {
     ssr: {
       // noExternal: ['@astrojs/starlight'],
