@@ -9,9 +9,11 @@ import { init, install, runHook } from '../index.js'
 const testDir = path.join(fileURLToPath(import.meta.url), '../..')
 
 test.beforeEach('mkdir test dir', async (t) => {
+  execSync('git config --global user.email "test@example.com"')
+  execSync('git config --global user.name "Test User"')
   execSync('git init')
-  // await fs.mkdir(testDir, { recursive: true })
-  // process.chdir(testDir)
+  await new Promise(resolve => setTimeout(resolve, 100))
+  console.log('Finish git init')
 })
 test.afterEach('rm test dir', async (t) => {
    // process.chdir(startDir)

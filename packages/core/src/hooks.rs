@@ -57,22 +57,10 @@ pub fn install() -> Result<(), Box<dyn Error>> {
     // generate hooks
     for hook_name in hooks.iter() {
       let hook_path = hooks_dir.join(hook_name);
-      let bin_entry_path = Path::new("./node_modules/@doremijs/igit-cli/bin/index.mjs");
       let hook_content = format!(
-        r#"#!/bin/sh
-run_command() {{
-    if command -v bun > /dev/null 2>&1; then
-        bun "$@"
-    elif command -v deno > /dev/null 2>&1; then
-        deno run "$@"
-    else
-        node "$@"
-    fi
-}}
-
-run_command {} run "{}" "$@"
+        r#"#!/usr/bin/env sh
+npx igit run "{}" "$@"
 "#,
-        bin_entry_path.to_string_lossy(),
         hook_name
       );
       fs::write(&hook_path, hook_content)?;
