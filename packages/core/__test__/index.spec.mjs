@@ -15,6 +15,9 @@ test.beforeEach('mkdir test dir', async (t) => {
   execSync('git init')
   await new Promise(resolve => setTimeout(resolve, 100))
   console.log('Finish git init')
+  execSync('git rev-parse --is-inside-work-tree', {
+    stdio: 'inherit',
+  })
 })
 test.afterEach('rm test dir', async (t) => {
    // process.chdir(startDir)
