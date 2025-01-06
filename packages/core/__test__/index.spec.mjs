@@ -30,9 +30,14 @@ test.afterEach('rm test dir', async (t) => {
    console.log('Finish rm test dir')
 })
 
-test.after('rm test dir', async (t) => {
-  await fs.rm(path.join(testDir), { recursive: true, force: true })
-  console.log('Finish test')
+test.after('Finally rm test dir', async (t) => {
+  try {
+    await new Promise(resolve => setTimeout(resolve, 100))
+    await fs.rm(path.join(testDir), { recursive: true, force: true })
+    console.log('Finish rm test dir')
+  } catch (error) {
+    console.log('Error rm test dir', error)
+  }
 })
 
 test.serial('init from native', async(t) => {
