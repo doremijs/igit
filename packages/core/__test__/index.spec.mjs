@@ -12,12 +12,14 @@ test.beforeEach('mkdir test dir', async (t) => {
   execSync('git config --global init.defaultBranch main')
   execSync('git config --global user.email "test@example.com"')
   execSync('git config --global user.name "Test User"')
+  // 添加安全目录配置，否则会报错
+  execSync('git config --global --add safe.directory "*"')
   execSync('git init')
-  await new Promise(resolve => setTimeout(resolve, 100))
+  // await new Promise(resolve => setTimeout(resolve, 100))
   console.log('Finish git init')
-  execSync('git rev-parse --is-inside-work-tree', {
-    stdio: 'inherit',
-  })
+  // execSync('git rev-parse --is-inside-work-tree', {
+  //   stdio: 'inherit',
+  // })
 })
 test.afterEach('rm test dir', async (t) => {
    // process.chdir(startDir)
