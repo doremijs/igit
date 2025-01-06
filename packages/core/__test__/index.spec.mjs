@@ -9,6 +9,7 @@ import { init, install, runHook } from '../index.js'
 const testDir = path.join(fileURLToPath(import.meta.url), '../..')
 
 test.beforeEach('mkdir test dir', async (t) => {
+  execSync('git config --global init.defaultBranch main')
   execSync('git config --global user.email "test@example.com"')
   execSync('git config --global user.name "Test User"')
   execSync('git init')
@@ -19,6 +20,7 @@ test.afterEach('rm test dir', async (t) => {
    // process.chdir(startDir)
    await fs.rm(path.join(testDir, '.config'), { recursive: true, force: true })
    await fs.rm(path.join(testDir, '.git'), { recursive: true, force: true })
+   console.log('Finish rm test dir')
 })
 
 test.serial('init from native', async(t) => {
