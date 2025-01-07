@@ -42,6 +42,11 @@ async function start() {
   for (const file of files) {
     await updatePackageJsonVersion(resolve(npmDir, file), version)
   }
+  // 读取../packages/cli/package.json 文件并替换 core 版本
+  const cliPackageJsonPath = resolve(__dirname, '../packages/cli/package.json')
+  let cliPackageJson = await readFile(cliPackageJsonPath, 'utf-8')
+  cliPackageJson = cliPackageJson.replace(/"\@doremijs\/igit\-core": "(.)+"/, `"@doremijs/igit-core": "${version}"`)
+  await writeFile(cliPackageJsonPath, cliPackageJson)
 }
 
 start()
