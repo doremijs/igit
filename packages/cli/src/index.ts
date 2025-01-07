@@ -20,10 +20,13 @@ Commands:
 
 function runCommand(shellCommand: ShellCommand) {
   // console.log(`${LOG_PREFIX}Running command: ${shellCommand.command} ${shellCommand.args?.join(' ')}`);
-  return spawnSync(shellCommand.command, (shellCommand.args ?? []), {
+  const ret = spawnSync(shellCommand.command, (shellCommand.args ?? []), {
     stdio: 'inherit',
     shell: true,
   });
+  if (ret.status !== 0) {
+    throw new Error(`Command failed with status ${ret.status}`);
+  }
 }
 
 async function start() {

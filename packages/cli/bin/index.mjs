@@ -17,10 +17,13 @@ Commands:
   commit [options]  Auto commit with ai (-d or --dry-run to dry run, -y to directly commit)
   version           Print the version`;
 function runCommand(shellCommand) {
-  return spawnSync(shellCommand.command, shellCommand.args ?? [], {
+  const ret = spawnSync(shellCommand.command, shellCommand.args ?? [], {
     stdio: "inherit",
     shell: true
   });
+  if (ret.status !== 0) {
+    throw new Error(`Command failed with status ${ret.status}`);
+  }
 }
 async function start() {
   if (args.length === 0) {
