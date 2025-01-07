@@ -119,7 +119,7 @@ commit_msg:
 ai:
   enabled: true
   baseUrl: https://api.deepseek.com
-  apiKey:
+  # apiKey:
   model: deepseek-chat
   respondIn: English
 ",

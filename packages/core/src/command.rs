@@ -1,16 +1,35 @@
-use std::error::Error;
-use std::process::{Command, Stdio};
+use std::fmt::{Display, Formatter, Result};
 
-pub fn run_command(command: &str, args: &str) -> Result<(), Box<dyn Error>> {
-  let output = Command::new("sh")
-    .arg("-c")
-    .arg(format!("PATH=$PATH:./node_modules/.bin {} {}", command, args))
-    .stdin(Stdio::inherit())
-    .stdout(Stdio::inherit())
-    .stderr(Stdio::inherit())
-    .output()?;
-  if !output.status.success() {
-    return Err("Command failed".into());
+#[derive(Debug)]
+#[napi(object)]
+pub struct ShellCommand {
+  #[napi(ts_type = "string")]
+  pub command: String,
+  #[napi(ts_type = "string[]")]
+  pub args: Option<Vec<String>>,
+}
+
+impl ShellCommand {
+  pub fn new<S: Into<String>>(command: S) -> Self {
+    Self {
+      command: command.into(),
+      args: None,
+    }
   }
-  Ok(())
+
+  pub fn with_args<S: Into<String>, I: Into<String>>(command: S, args: Vec<I>) -> Self {
+    Self {
+      command: command.into(),
+      args: Some(args.into_iter().map(|s| s.into()).collect()),
+    }
+  }
+}
+
+impl Display for ShellCommand {
+  fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+    match &self.args {
+      Some(args) => write!(f, "{} {}", self.command, args.join(" ")),
+      None => write!(f, "{}", self.command),
+    }
+  }
 }

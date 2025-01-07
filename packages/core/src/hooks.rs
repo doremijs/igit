@@ -1,7 +1,7 @@
-use crate::command::run_command;
+use crate::command::ShellCommand;
 use crate::config;
 use crate::config::HookCommand;
-use crate::config::IgitConfig;
+use crate::log::LOG_PREFIX;
 use fast_glob::glob_match;
 use std::error::Error;
 use std::fs;
@@ -30,44 +30,45 @@ pub fn install() -> Result<(), Box<dyn Error>> {
     fs::create_dir_all(hooks_dir)?;
   }
 
+  let mut target_hooks = Vec::new();
+  if config.commit_msg.enabled {
+    target_hooks.push("commit-msg");
+  }
+  if config.staged_hooks.enabled {
+    target_hooks.push("pre-commit");
+  }
   if config.hooks.enabled {
     // all hooks
-    let mut hooks = config
-      .hooks
-      .hooks
-      .keys()
-      .map(|s| s.as_str())
-      .collect::<Vec<&str>>();
-    if config.commit_msg.enabled && !hooks.contains(&"commit-msg") {
-      hooks.push("commit-msg");
-    }
-    if config.staged_hooks.enabled && !hooks.contains(&"pre-commit") {
-      hooks.push("pre-commit");
-    }
-    // clear hooks
-    let entries = fs::read_dir(hooks_dir)?;
-    for entry in entries {
-      let entry = entry?;
-      let path = entry.path();
-      if path.is_file() && path.extension().is_none() {
-        fs::remove_file(path)?;
+    for hook_name in config.hooks.hooks.keys() {
+      if !target_hooks.contains(&hook_name.as_str()) {
+        target_hooks.push(hook_name);
       }
-    }
-
-    // generate hooks
-    for hook_name in hooks.iter() {
-      let hook_path = hooks_dir.join(hook_name);
-      let hook_content = format!(
-        r#"#!/usr/bin/env sh
-npx igit run "{}" "$@"
-"#,
-        hook_name
-      );
-      fs::write(&hook_path, hook_content)?;
-      Command::new("chmod").arg("+x").arg(&hook_path).output()?;
     }
   }
 
+  // clear hooks
+  let entries = fs::read_dir(hooks_dir)?;
+  for entry in entries {
+    let entry = entry?;
+    let path = entry.path();
+    if path.is_file() && path.extension().is_none() {
+      fs::remove_file(path)?;
+    }
+  }
+
+  // generate hooks
+  for hook_name in target_hooks.iter() {
+    let hook_path = hooks_dir.join(hook_name);
+    let hook_content = format!(
+      r#"#!/usr/bin/env sh
+npx igit run "{}" "$@"
+"#,
+      hook_name
+    );
+    fs::write(&hook_path, hook_content)?;
+    Command::new("chmod").arg("+x").arg(&hook_path).output()?;
+  }
+  println!("{}Hooks installed", LOG_PREFIX);
   Ok(())
 }
 
@@ -230,9 +231,15 @@ fn get_commands(command: &HookCommand) -> Vec<&str> {
 }
 
 /**
- * run commands for staged files
+ * collect staged commands
  */
-fn run_commands_for_staged_files(config: &IgitConfig) -> Result<(), Box<dyn Error>> {
+pub fn collect_staged_commands() -> Result<Vec<ShellCommand>, Box<dyn Error>> {
+  let config = config::check()?;
+  // no need to collect staged commands
+  if !config.staged_hooks.enabled || config.staged_hooks.rules.is_empty() {
+    return Ok(vec![]);
+  }
+  let mut staged_commands: Vec<ShellCommand> = vec![];
   let staged_files = Command::new("git")
     .arg("diff")
     .arg("--cached")
@@ -248,30 +255,22 @@ fn run_commands_for_staged_files(config: &IgitConfig) -> Result<(), Box<dyn Erro
     if !matched_files.is_empty() {
       let commands = get_commands(command);
       for command in commands {
-        println!("\x1b[90mRunning staged command:\x1b[0m \x1b[32m{}\x1b[0m \x1b[90mfor\x1b[0m \x1b[32m{}\x1b[0m \x1b[90mfiles that match pattern(\x1b[0m\x1b[34m{}\x1b[0m\x1b[90m)\x1b[0m", command, matched_files.len(), pattern);
-        run_command(command, &matched_files.join(" "))?;
+        println!("{}\x1b[90mRunning staged command:\x1b[0m \x1b[32m{}\x1b[0m \x1b[90mfor\x1b[0m \x1b[32m{}\x1b[0m \x1b[90mfiles that match pattern(\x1b[0m\x1b[34m{}\x1b[0m\x1b[90m)\x1b[0m", LOG_PREFIX, command, matched_files.len(), pattern);
+        staged_commands.push(ShellCommand::with_args(command.to_string(), matched_files.to_vec()));
       }
     }
   }
-  Command::new("git").arg("add").arg(".").output()?;
-  Ok(())
+  Ok(staged_commands)
 }
 
 /**
- * run hooks
+ * collect hook commands
  */
-pub fn run_hook(hook_name: &str, args: &Vec<String>) -> Result<(), Box<dyn Error>> {
+pub fn collect_hook_commands(hook_name: &str, args: &Vec<String>) -> Result<Vec<ShellCommand>, Box<dyn Error>> {
   let config = config::check()?;
-  // pre-commit hook
-  if hook_name == "pre-commit" {
-    if config.staged_hooks.enabled {
-      if config.staged_hooks.rules.keys().len() > 0 {
-        run_commands_for_staged_files(&config)?;
-      }
-    }
-  }
+  let mut collected_commands: Vec<ShellCommand> = vec![];
   // commit message hook
-  else if hook_name == "commit-msg" {
+  if hook_name == "commit-msg" {
     if config.commit_msg.enabled {
       let commit_message_path = &args[0];
       let mut commit_message_str = fs::read_to_string(commit_message_path).map_err(|e| {
@@ -298,7 +297,7 @@ pub fn run_hook(hook_name: &str, args: &Vec<String>) -> Result<(), Box<dyn Error
       // prepend emoji
       if config.commit_msg.prepend_emoji {
         commit_message_str = append_emoji_for_message(&commit_message, &mut commit_message_str);
-        println!("\x1b[32mAppend emoji for commit message.\x1b[0m");
+        println!("{}\x1b[32mAppend emoji for commit message.\x1b[0m", LOG_PREFIX);
         fs::write(commit_message_path, commit_message_str)?;
       }
     }
@@ -309,14 +308,14 @@ pub fn run_hook(hook_name: &str, args: &Vec<String>) -> Result<(), Box<dyn Error
       let commands = get_commands(script);
       for command in commands {
         println!(
-          "\x1b[90mRunning\x1b[0m \x1b[34m{}\x1b[0m \x1b[90mhook:\x1b[0m \x1b[32m{}\x1b[0m",
-          hook_name, command
+          "{}\x1b[90mRunning\x1b[0m \x1b[34m{}\x1b[0m \x1b[90mhook:\x1b[0m \x1b[32m{}\x1b[0m",
+          LOG_PREFIX, hook_name, command
         );
-        run_command(command, &args.join(" "))?;
+        collected_commands.push(ShellCommand::with_args(command, args.to_vec()));
       }
     }
   }
-  Ok(())
+  Ok(collected_commands)
 }
 
 /* ------------ test ------------ */
@@ -438,8 +437,6 @@ mod tests {
     assert_eq!(parsed.scope, None);
     assert!(!parsed.is_breaking);
     assert_eq!(parsed.description, "prevent racing of requests");
-    println!("{:?}", parsed.body);
-    println!("{:?}", parsed.footers);
     assert_eq!(parsed.body.unwrap(), "Introduce a request id and a reference to latest request. Dismiss\nincoming responses other than from latest request.\n\nRemove timeouts which were used to mitigate the racing issue but are\nobsolete now.");
     assert_eq!(parsed.footers.unwrap().len(), 2);
   }

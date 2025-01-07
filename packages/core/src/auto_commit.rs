@@ -1,12 +1,11 @@
-use crate::command::run_command;
 use crate::config;
 use reqwest::Client;
 use serde_json::json;
 use spinners::{Spinner, Spinners};
 use std::env;
-use std::process::{Command, Stdio};
+use std::process::Command;
 
-pub async fn generate_commit_message(commit: bool) -> Result<(), String> {
+pub async fn generate_commit_message() -> Result<String, String> {
   let config = config::check()?;
   if !config.ai.enabled {
     return Err("Auto commit is not enabled".to_string());
@@ -86,6 +85,7 @@ pub async fn generate_commit_message(commit: bool) -> Result<(), String> {
     .map_err(|e| format!("Failed to parse response: {}", e))?;
 
   spinner.stop();
+  println!("");
 
   let content = response_json["choices"][0]["message"]["content"]
     .as_str()
@@ -93,27 +93,10 @@ pub async fn generate_commit_message(commit: bool) -> Result<(), String> {
     .map_err(|e| format!("Failed to parse response: {}", e))?
     .to_string();
 
-  println!("{}", content);
   if content.is_empty() {
     return Err("No commit message generated".to_string());
   }
-  if commit {
-    run_command("git", &format!("commit -m \"{}\"", content))
-      .map_err(|e| format!("Failed to commit: {}", e))?;
-  } else {
-    let mut ps_commit = Command::new("git")
-      .arg("commit")
-      .arg("-e")
-      .arg("-m")
-      .arg(content)
-      .stdin(Stdio::inherit())
-      .stdout(Stdio::inherit())
-      .stderr(Stdio::inherit())
-      .spawn()
-      .unwrap();
-    ps_commit.wait().unwrap();
-  }
-  Ok(())
+  Ok(content)
 }
 
 fn get_git_diff() -> Result<String, String> {
