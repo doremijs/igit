@@ -162,7 +162,8 @@ pub fn check() -> Result<IgitConfig, String> {
   let is_git_repo = git::is_git_repo();
 
   if !is_git_repo {
-    return Err("Current directory is not a git repository".into());
+    let current_dir = std::env::current_dir().unwrap();
+    return Err(format!("Current directory '{}' is not a git repository", current_dir.display()).into());
   }
   let config = parse()?;
   Ok(config)
