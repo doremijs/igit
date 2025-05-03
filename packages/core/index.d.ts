@@ -6,9 +6,11 @@
 export interface ShellCommand {
   command: string
   args?: string[]
+  files?: string[]
 }
 export declare function init(): void
 export declare function install(): void
 export declare function collectStagedCommands(): Array<ShellCommand>
 export declare function collectHookCommands(hookName: string, args: Array<string>): Array<ShellCommand>
+export declare function reAddStagedFiles(files: Array<string>): void
 export declare function autoCommit(): Promise<string>

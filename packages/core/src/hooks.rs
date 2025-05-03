@@ -240,23 +240,14 @@ pub fn collect_staged_commands() -> Result<Vec<ShellCommand>, Box<dyn Error>> {
     return Ok(vec![]);
   }
   let mut staged_commands: Vec<ShellCommand> = vec![];
-  let staged_files = Command::new("git")
-    .arg("diff")
-    .arg("--cached")
-    .arg("--name-only")
-    .output()?;
-  if !staged_files.status.success() {
-    return Err("Failed to get staged files".into());
-  }
-  let files = String::from_utf8(staged_files.stdout)?;
-  let staged_files = files.trim().split('\n').collect::<Vec<&str>>();
+  let staged_files = get_staged_files()?;
   for (pattern, command) in config.staged_hooks.rules.iter() {
-    let matched_files = get_matched_files(&pattern, &staged_files);
+    let matched_files = get_matched_files(&pattern, &staged_files.iter().map(|s| s.as_str()).collect::<Vec<&str>>());
     if !matched_files.is_empty() {
       let commands = get_commands(command);
       for command in commands {
         println!("{}\x1b[90mRunning staged command:\x1b[0m \x1b[32m{}\x1b[0m \x1b[90mfor\x1b[0m \x1b[32m{}\x1b[0m \x1b[90mfiles that match pattern(\x1b[0m\x1b[34m{}\x1b[0m\x1b[90m)\x1b[0m", LOG_PREFIX, command, matched_files.len(), pattern);
-        staged_commands.push(ShellCommand::with_args(command.to_string(), matched_files.to_vec()));
+        staged_commands.push(ShellCommand::with_args_and_files(command.to_string(), &matched_files, &matched_files));
       }
     }
   }
@@ -316,6 +307,46 @@ pub fn collect_hook_commands(hook_name: &str, args: &Vec<String>) -> Result<Vec<
     }
   }
   Ok(collected_commands)
+}
+
+/**
+ * re-run git add from givin files
+ */
+pub fn re_add_files(files: Vec<String>) -> Result<(), String> {
+  let staged_files = get_staged_files().map_err(|e| e.to_string())?;
+
+  // 找出传入文件列表中已经被staged的文件
+  let files_to_add: Vec<String> = files
+    .iter()
+    .filter(|f| staged_files.contains(f))
+    .cloned()
+    .collect();
+
+  if !files_to_add.is_empty() {
+    Command::new("git")
+      .arg("add")
+      .args(&files_to_add)
+      .output()
+      .map_err(|e| format!("Failed to re-add files: {}", e))?;
+  }
+
+  Ok(())
+}
+
+/**
+ * Get staged files from git
+ */
+fn get_staged_files() -> Result<Vec<String>, Box<dyn Error>> {
+  let output = Command::new("git")
+    .args(["diff", "--cached", "--name-only"])
+    .output()?;
+
+  if !output.status.success() {
+    return Err("Failed to get staged files".into());
+  }
+
+  let files = String::from_utf8(output.stdout)?;
+  Ok(files.trim().split('\n').map(|s| s.to_string()).collect())
 }
 
 /* ------------ test ------------ */

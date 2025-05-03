@@ -2,6 +2,13 @@
   "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
   "extends": ["./node_modules/@doremijs/biome-config/biome.json"],
   "files": {
-    "ignore": ["src/api/models.ts", "src/api/client.ts"]
+    "ignore": ["src/api/models.ts", "src/api/client.ts", "**/*.js", "packages/cli/bin/index.mjs"]
+  },
+  "linter": {
+    "rules": {
+      "correctness": {
+        "noSwitchDeclarations": "off"
+      }
+    }
   }
 }

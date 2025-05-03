@@ -1,6 +1,6 @@
 {
   "name": "@doremijs/igit-core",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
@@ -16,12 +16,7 @@
     }
   },
   "description": "A CLI tool for combining git workflows with Rust bindings",
-  "keywords": [
-    "igit",
-    "cli",
-    "git",
-    "hooks"
-  ],
+  "keywords": ["igit", "cli", "git", "hooks"],
   "license": "LGPL-3.0-or-later",
   "repository": {
     "type": "git",

@@ -33,6 +33,11 @@ pub fn collect_hook_commands(hook_name: String, args: Vec<String>) -> Result<Vec
 }
 
 #[napi]
+pub fn re_add_staged_files(files: Vec<String>) -> Result<()> {
+  hooks::re_add_files(files).map_err(|e| Error::from_reason(e.to_string()))
+}
+
+#[napi]
 pub async fn auto_commit() -> Result<String> {
   auto_commit::generate_commit_message().await.map_err(|e| Error::from_reason(e))
 }

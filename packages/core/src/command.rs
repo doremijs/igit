@@ -7,6 +7,8 @@ pub struct ShellCommand {
   pub command: String,
   #[napi(ts_type = "string[]")]
   pub args: Option<Vec<String>>,
+  #[napi(ts_type = "string[]")]
+  pub files: Option<Vec<String>>,
 }
 
 impl ShellCommand {
@@ -14,6 +16,7 @@ impl ShellCommand {
     Self {
       command: command.into(),
       args: None,
+      files: None
     }
   }
 
@@ -21,6 +24,15 @@ impl ShellCommand {
     Self {
       command: command.into(),
       args: Some(args.into_iter().map(|s| s.into()).collect()),
+      files: None,
+    }
+  }
+
+  pub fn with_args_and_files<S: Into<String>, I: Into<String> + std::fmt::Display>(command: S, args: &[I], files: &[I]) -> Self {
+    Self {
+      command: command.into(),
+      args: Some(args.iter().map(|s| s.to_string()).collect()),
+      files: Some(files.iter().map(|s| s.to_string()).collect()),
     }
   }
 }
