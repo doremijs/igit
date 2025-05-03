@@ -78,6 +78,9 @@ commit_msg:
 - Commands are executed in the order specified in the configuration file
 - If any command fails (returns non-zero status code), the hook will stop executing
 - Supports all shell commands and `npm` scripts
+- In CI environments, hook installation can be skipped automatically
+- Use `--skip-install` flag to manual skip hook installation
+- After executing staged files commands, files will be automatically re-added to git staging area
 
 ## Best Practices 💡
 
