@@ -368,6 +368,8 @@ jobs:
       - name: List packages
         run: ls -R ./packages/core/npm
         shell: bash
+      - name: Build cli
+        run: yarn workspace @doremijs/igit-cli build
       - name: Publish
         run: |
           cp README.md packages/cli/README.md
